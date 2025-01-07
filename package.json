@@ -1,0 +1,21 @@
+{
+  "name": "pool-brasil",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "lint:check": "prettier --check .",
+    "lint:fix": "prettier --write .",
+    "dev": "next dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "next": "^13.1.6",
+    "prettier": "^3.4.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

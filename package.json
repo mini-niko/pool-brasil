@@ -5,7 +5,7 @@
   "scripts": {
     "lint:check": "prettier --check .",
     "lint:fix": "prettier --write .",
-    "dev": "next dev",
+    "dev": "npm run services:up && next dev",
     "services:up": "docker compose -f infra/compose.yaml up -d",
     "services:stop": "docker compose -f infra/compose.yaml stop",
     "services:down": "docker compose -f infra/compose.yaml down",

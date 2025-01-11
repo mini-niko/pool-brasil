@@ -17,14 +17,3 @@ test("GET to /api/v1/status should return 200", async () => {
   expect(database.max_connections).toBe(100);
   expect(database.version).toBe("16.0");
 });
-
-/*
-
-database: {
-  status: healthy,
-  open_connections: 1,
-  max_connections: 10,
-  version: 16.6
-}
-
-*/

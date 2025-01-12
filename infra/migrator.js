@@ -21,6 +21,7 @@ async function listPendingMigrations() {
 
     return migrate;
   } catch (err) {
+    console.log(err);
     throw err;
   } finally {
     await dbClient.end();
@@ -38,6 +39,7 @@ async function runPendingMigrations() {
 
     return migrate;
   } catch (err) {
+    console.log(err);
     throw err;
   } finally {
     await dbClient.end();

@@ -35,6 +35,7 @@ async function runPendingMigrations() {
     const migrate = await migrationRunner({
       ...runnerOptions,
       dbClient,
+      log: () => {},
     });
 
     return migrate;

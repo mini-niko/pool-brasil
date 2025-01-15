@@ -1,3 +1,4 @@
+import { InternalServerError } from "errors";
 import { Client } from "pg";
 
 async function getNewClient() {
@@ -22,8 +23,7 @@ async function query(query, params = []) {
     const result = await client.query(query, params);
     return result;
   } catch (err) {
-    console.log(err);
-    throw err;
+    throw new InternalServerError({});
   } finally {
     await client.end();
   }

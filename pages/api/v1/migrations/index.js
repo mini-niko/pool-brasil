@@ -1,28 +1,21 @@
 import migrator from "infra/migrator";
+import router from "infra/router";
 
-const methods = {
-  async GET(res) {
-    const pendingMigrations = await migrator.listPendingMigrations();
+const migrationsRouter = router.get(getHandler).post(postHandler);
 
-    return res.status(200).json(pendingMigrations);
-  },
+async function getHandler(req, res) {
+  const pendingMigrations = await migrator.listPendingMigrations();
 
-  async POST(res) {
-    const pendingMigrations = await migrator.runPendingMigrations();
-
-    if (pendingMigrations.length === 0)
-      return res.status(200).json(pendingMigrations);
-
-    return res.status(201).json(pendingMigrations);
-  },
-};
-
-async function migrations(req, res) {
-  const executeMethod = methods[req.method];
-
-  if (!executeMethod) return res.status(405).end();
-
-  return executeMethod(res);
+  return res.status(200).json(pendingMigrations);
 }
 
-export default migrations;
+async function postHandler(req, res) {
+  const pendingMigrations = await migrator.runPendingMigrations();
+
+  if (pendingMigrations.length === 0)
+    return res.status(200).json(pendingMigrations);
+
+  return res.status(201).json(pendingMigrations);
+}
+
+export default migrationsRouter.handler();

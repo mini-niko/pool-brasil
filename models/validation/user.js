@@ -1,5 +1,7 @@
-import { ValidationError } from "errors";
+import { cpf } from "cpf-cnpj-validator";
+import { DuplicateError, ValidationError } from "errors";
 import Joi from "joi";
+import users from "models/users";
 const minimumAge = 16;
 
 const dateMinimumAge = new Date().setFullYear(
@@ -9,17 +11,20 @@ const dateMinimumAge = new Date().setFullYear(
 const userSchema = Joi.object({
   name: Joi.string().alphanum().min(3).max(30).required(),
   cpf: Joi.string()
-    .pattern(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/)
-    .required(),
+    .required()
+    .custom((value, helpers) => {
+      return cpf.isValid(value) ? value : helpers.error("any.invalid");
+    }),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).max(60).required(),
+  confirm_password: Joi.valid(Joi.ref("password")).required(),
   birth_day: Joi.date().iso().max(dateMinimumAge).required(),
 });
 
 function validate(userData) {
   try {
     userData = JSON.parse(JSON.stringify(userData));
-  } catch (err) {
+  } catch {
     throw new ValidationError({
       message: "Cannot parse the sent data.",
       action: "Check if the data is a valid JSON and try again.",
@@ -29,13 +34,39 @@ function validate(userData) {
 
   const error = userSchema.validate(userData).error?.details[0];
 
-  console.log(new Date(userData.birth_day));
-
-  if (error) throw new ValidationError({ message: error.message });
+  if (error)
+    throw new ValidationError({
+      message: error.message,
+      stack: new Error().stack,
+    });
 }
 
-const user = {
+async function alreadyInUse(userData) {
+  const nameInUse = (await users.getUserByName(userData.name)) !== undefined;
+  if (nameInUse)
+    throw new DuplicateError({
+      message: "This name is already in use",
+      action: "Try send another name",
+    });
+
+  const cpfInUse = (await users.getUserByCPF(userData.cpf)) !== undefined;
+  if (cpfInUse)
+    throw new DuplicateError({
+      message: "This CPF is already in use",
+      action: "Enter in your account with this CPF",
+    });
+
+  const emailInUse = (await users.getUserByEmail(userData.email)) !== undefined;
+  if (emailInUse)
+    throw new DuplicateError({
+      message: "This email is already in use",
+      action: "Enter with you email or send another email",
+    });
+}
+
+const userValidation = {
   validate,
+  alreadyInUse,
 };
 
-export default user;
+export default userValidation;

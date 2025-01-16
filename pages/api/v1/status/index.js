@@ -1,7 +1,7 @@
 import database from "infra/database";
-import router from "infra/router";
+import { createRouter } from "next-connect";
 
-const statusRouter = router.get(getHandler);
+export default createRouter().get(getHandler).handler();
 
 async function getHandler(req, res) {
   const currentTime = new Date().toISOString();
@@ -15,5 +15,3 @@ async function getHandler(req, res) {
 
   res.status(200).json(responseBody);
 }
-
-export default statusRouter.handler();

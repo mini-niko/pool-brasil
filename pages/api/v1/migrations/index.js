@@ -1,7 +1,7 @@
 import migrator from "infra/migrator";
-import router from "infra/router";
+import { createRouter } from "next-connect";
 
-const migrationsRouter = router.get(getHandler).post(postHandler);
+export default createRouter().get(getHandler).post(postHandler).handler();
 
 async function getHandler(req, res) {
   const pendingMigrations = await migrator.listPendingMigrations();
@@ -17,5 +17,3 @@ async function postHandler(req, res) {
 
   return res.status(201).json(pendingMigrations);
 }
-
-export default migrationsRouter.handler();

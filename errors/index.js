@@ -10,6 +10,17 @@ export class InternalServerError extends Error {
   }
 }
 
+export class DuplicateError extends Error {
+  constructor({ message, action, statusCode, stack }) {
+    super();
+    this.name = "DuplicateError";
+    this.message = message || "Some data is already in use.";
+    this.action = action || "Try change your data and try again";
+    this.statusCode = statusCode || 409;
+    this.stack = stack;
+  }
+}
+
 export class ValidationError extends Error {
   constructor({ message, action, statusCode, stack }) {
     super();

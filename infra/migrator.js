@@ -18,11 +18,12 @@ async function listPendingMigrations() {
       ...runnerOptions,
       dbClient,
       dryRun: true,
+      log: () => {},
     });
 
     return migrate;
-  } catch (err) {
-    throw new InternalServerError({});
+  } catch {
+    throw new InternalServerError({ stack: new Error().stack });
   } finally {
     await dbClient.end();
   }
@@ -39,8 +40,8 @@ async function runPendingMigrations() {
     });
 
     return migrate;
-  } catch (err) {
-    throw new InternalServerError({});
+  } catch {
+    throw new InternalServerError({ stack: new Error().stack });
   } finally {
     await dbClient.end();
   }

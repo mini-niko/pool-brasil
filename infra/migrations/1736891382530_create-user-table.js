@@ -19,7 +19,6 @@ exports.up = (pgm) => {
     name: {
       type: "varchar(64)",
       notNull: true,
-      unique: true,
     },
     cpf: {
       type: "varchar(11)",

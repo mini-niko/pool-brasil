@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 describe("POST to /api/v1/users", () => {
   describe("Annonymous user", () => {
-    describe("Create an user", () => {
+    describe("Creating an user", () => {
       test("Valid", async () => {
         const user = {
           name: "Test",
@@ -69,7 +69,7 @@ describe("POST to /api/v1/users", () => {
           });
           test("CPF", async () => {
             const user = {
-              name: "Test2",
+              name: "Test again",
               cpf: "07563801030",
               email: "example2@test.com",
               password: "12345678",
@@ -93,7 +93,7 @@ describe("POST to /api/v1/users", () => {
           });
           test("Email", async () => {
             const user = {
-              name: "Test2",
+              name: "Test again",
               cpf: "06124688018",
               email: "example@test.com",
               password: "12345678",

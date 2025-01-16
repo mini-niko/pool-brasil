@@ -11,7 +11,7 @@ function handlerError(err, req, res) {
 
 async function parseJSON(req, res, next) {
   try {
-    req.body = JSON.parse(req.body);
+    if (req.body) req.body = JSON.parse(req.body);
   } catch {
     throw new InternalServerError({ stack: new Error().stack });
   }

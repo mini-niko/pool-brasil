@@ -1,7 +1,7 @@
 import database from "infra/database";
 import userValidation from "./validation/user";
 
-async function createUser(userData) {
+async function createUser(userData = {}) {
   userValidation.validate(userData);
   await userValidation.alreadyInUse(userData);
 
@@ -19,16 +19,25 @@ async function createUser(userData) {
   return response.rows[0];
 }
 
-async function getUserByName(name) {
-  const response = await database.query("SELECT * FROM users WHERE name = $1", [
-    name,
+async function getUserById(id) {
+  const response = await database.query("SELECT * FROM users WHERE id = $1;", [
+    id,
   ]);
 
   return response.rows[0];
 }
 
+async function getUserByName(name) {
+  const response = await database.query(
+    "SELECT * FROM users WHERE name = $1;",
+    [name],
+  );
+
+  return response.rows[0];
+}
+
 async function getUserByCPF(cpf) {
-  const response = await database.query("SELECT * FROM users WHERE cpf = $1", [
+  const response = await database.query("SELECT * FROM users WHERE cpf = $1;", [
     cpf,
   ]);
 
@@ -37,7 +46,7 @@ async function getUserByCPF(cpf) {
 
 async function getUserByEmail(email) {
   const response = await database.query(
-    "SELECT * FROM users WHERE email = $1",
+    "SELECT * FROM users WHERE email = $1;",
     [email],
   );
 
@@ -46,6 +55,7 @@ async function getUserByEmail(email) {
 
 const users = {
   createUser,
+  getUserById,
   getUserByName,
   getUserByCPF,
   getUserByEmail,

@@ -1,6 +1,6 @@
 import { cpf } from "cpf-cnpj-validator";
 import { DuplicateError, ValidationError } from "errors";
-import Joi from "joi";
+import Joi, { custom } from "joi";
 import users from "models/users";
 const minimumAge = 16;
 
@@ -9,7 +9,15 @@ const dateMinimumAge = new Date().setFullYear(
 );
 
 const userSchema = Joi.object({
-  name: Joi.string().alphanum().min(3).max(30).required(),
+  name: Joi.string()
+    .min(3)
+    .max(30)
+    .required()
+    .custom((value, helpers) => {
+      return /^[A-Za-zÀ-ÿ]+(?:[-'\s][A-Za-zÀ-ÿ]+)*$/.test(value)
+        ? value
+        : helpers.error("any.invalid");
+    }),
   cpf: Joi.string()
     .required()
     .custom((value, helpers) => {

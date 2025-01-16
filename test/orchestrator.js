@@ -1,6 +1,7 @@
 import retry from "async-retry";
 import database from "infra/database";
 import migrator from "infra/migrator";
+import users from "models/users";
 
 async function waitForAllServices() {
   await waitForWebServices();
@@ -29,10 +30,15 @@ async function upMigrations() {
   await migrator.runPendingMigrations();
 }
 
+async function setMockUser(user) {
+  return await users.createUser(user);
+}
+
 const orchestrator = {
   waitForAllServices,
   cleanDatabase,
   upMigrations,
+  setMockUser,
 };
 
 export default orchestrator;

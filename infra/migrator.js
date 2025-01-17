@@ -1,10 +1,10 @@
 import { InternalServerError } from "errors";
 import database from "infra/database.js";
 import migrationRunner from "node-pg-migrate";
-import { join } from "node:path";
+import { resolve } from "node:path";
 
 const runnerOptions = {
-  dir: join("infra", "migrations"),
+  dir: resolve("infra", "migrations"),
   direction: "up",
   verbose: true,
   migrationsTable: "pgmigrations",

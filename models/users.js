@@ -20,6 +20,8 @@ async function createUser(userData = {}) {
 }
 
 async function getUserById(id) {
+  userValidation.validID(id);
+
   const response = await database.query("SELECT * FROM users WHERE id = $1;", [
     id,
   ]);

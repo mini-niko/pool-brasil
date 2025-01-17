@@ -22,8 +22,11 @@ async function query(query, params = []) {
     client = await getNewClient();
     const result = await client.query(query, params);
     return result;
-  } catch {
-    throw new InternalServerError({ stack: new Error().stack });
+  } catch (err) {
+    throw new InternalServerError({
+      message: err.message,
+      stack: new Error().stack,
+    });
   } finally {
     await client.end();
   }

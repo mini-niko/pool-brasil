@@ -32,12 +32,34 @@ describe("GET to /api/v1/users", () => {
 
         const body = await response.json();
 
-        expect(body.name).toBe(mockUser.name);
-        expect(body.cpf).toBe(mockUser.cpf);
-        expect(body.email).toBe(mockUser.email);
-        expect(body.password).toBe(mockUser.password);
-        expect(body.confirm_password).toBe(mockUser.confirm_password);
-        expect(body.birth_day).toBe(mockUser.birth_day);
+        expect(body).toEqual(mockUser);
+      });
+      test("With non-existent ID", async () => {
+        const invalidId = "440e4e6b-0c5b-418e-985e-4c05e4e719cf";
+
+        const response = await fetch(
+          `http://localhost:3000/api/v1/users?id=${invalidId}`,
+        );
+
+        expect(response.status).toBe(404);
+      });
+      test("With invalid ID", async () => {
+        const invalidId = "invalid-id";
+
+        const response = await fetch(
+          `http://localhost:3000/api/v1/users?id=${invalidId}`,
+        );
+
+        expect(response.status).toBe(400);
+
+        const body = await response.json();
+
+        expect(body).toEqual({
+          name: "ValidationError",
+          message: '"id" must be and uuid id.',
+          action: "Try send an valid id",
+          status_code: 400,
+        });
       });
     });
   });

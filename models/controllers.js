@@ -2,7 +2,12 @@ import { InternalServerError } from "errors";
 import snakeize from "snakeize";
 
 function handlerError(err, req, res) {
-  let responseError = !err.statusCode ? new InternalServerError({}) : err;
+  let responseError = err;
+
+  if (responseError.statusCode === 500 || !responseError.statusCode) {
+    console.error(err);
+    responseError = new InternalServerError({});
+  }
 
   responseError = snakeize(responseError);
 
@@ -10,11 +15,8 @@ function handlerError(err, req, res) {
 }
 
 async function parseJSON(req, res, next) {
-  try {
-    if (req.body) req.body = JSON.parse(req.body);
-  } catch {
-    throw new InternalServerError({ stack: new Error().stack });
-  }
+  if (typeof req.body === "string" && req.body.length > 1)
+    req.body = JSON.parse(req.body);
 
   await next();
 }

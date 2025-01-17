@@ -22,16 +22,20 @@
   "description": "",
   "dependencies": {
     "async-retry": "1.3.3",
+    "cpf-cnpj-validator": "^1.0.3",
     "dotenv": "16.4.7",
     "dotenv-expand": "12.0.1",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-jest": "28.10.0",
     "husky": "9.1.7",
+    "joi": "^17.13.3",
     "next": "15.1.4",
+    "next-connect": "^1.0.0",
     "node-pg-migrate": "7.9.0",
     "pg": "8.13.1",
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "snakeize": "^0.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "19.6.1",

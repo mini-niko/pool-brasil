@@ -1,6 +1,6 @@
 import { cpf } from "cpf-cnpj-validator";
 import { DuplicateError, ValidationError } from "errors";
-import Joi, { custom } from "joi";
+import Joi from "joi";
 import users from "models/users";
 const minimumAge = 16;
 

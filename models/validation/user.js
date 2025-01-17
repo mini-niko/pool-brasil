@@ -72,9 +72,21 @@ async function alreadyInUse(userData) {
     });
 }
 
+function validID(id) {
+  const regex =
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+
+  if (!regex.test(id))
+    throw new ValidationError({
+      message: '"id" must be and uuid id.',
+      action: "Try send an valid id",
+    });
+}
+
 const userValidation = {
   validate,
   alreadyInUse,
+  validID,
 };
 
 export default userValidation;

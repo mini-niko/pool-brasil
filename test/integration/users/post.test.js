@@ -9,53 +9,63 @@ beforeAll(async () => {
 describe("POST to /api/v1/users", () => {
   describe("Annonymous user", () => {
     describe("Creating an user", () => {
+      const user = {
+        name: "Test",
+        cpf: "07563801030",
+        email: "example@test.com",
+        password: "12345678",
+        confirm_password: "12345678",
+        birth_day: new Date("01/01/2000"),
+        address: {
+          state: "SC",
+          city: "Xanxerê",
+          street: "Avenida Brasil",
+          number: 1,
+          complement: "apto 4",
+          reference: "Ao lado do mercado XXX",
+        },
+      };
+
+      function addUserAttributes(oldUser, newUser) {
+        oldUser.id = newUser.id;
+        oldUser.features = newUser.features;
+        oldUser.birth_day = newUser.birth_day;
+        oldUser.created_at = newUser.created_at;
+        oldUser.updated_at = newUser.updated_at;
+        delete oldUser.confirm_password;
+
+        return oldUser;
+      }
+
       test("Valid", async () => {
-        const user = {
-          name: "Test",
-          cpf: "07563801030",
-          email: "example@test.com",
-          password: "12345678",
-          confirm_password: "12345678",
-          birth_day: new Date("01/01/2000"),
+        let validUser = {
+          ...user,
         };
 
         const response = await fetch("http://localhost:3000/api/v1/users", {
           method: "POST",
-          body: JSON.stringify(user),
+          body: JSON.stringify(validUser),
         });
 
         expect(response.status).toBe(201);
 
         const body = await response.json();
 
-        expect(body.id.length).toBe(36);
-        expect(body.name).toBe(user.name);
-        expect(body.cpf).toBe(user.cpf);
-        expect(body.email).toBe(user.email);
-        expect(body.password).toBe(user.password);
+        validUser = addUserAttributes(validUser, body);
 
-        const createdAtISO = new Date(body.created_at).toISOString();
-        const updatedAtISO = new Date(body.updated_at).toISOString();
-
-        expect(body.birth_day).toBe(user.birth_day.toISOString());
-        expect(body.created_at).toBe(createdAtISO);
-        expect(body.updated_at).toBe(updatedAtISO);
+        expect(body).toEqual(validUser);
       });
       describe("Invalid:", () => {
         describe("With existent", () => {
           test("Name", async () => {
-            const user = {
+            const nameExistUser = {
+              ...user,
               name: "Test",
-              cpf: "07563801030",
-              email: "example2@test.com",
-              password: "12345678",
-              confirm_password: "12345678",
-              birth_day: new Date("01/01/2000"),
             };
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
-              body: JSON.stringify(user),
+              body: JSON.stringify(nameExistUser),
             });
 
             expect(response.status).toBe(409);
@@ -68,18 +78,15 @@ describe("POST to /api/v1/users", () => {
             expect(body.status_code).toBe(409);
           });
           test("CPF", async () => {
-            const user = {
+            const cpfExistUser = {
+              ...user,
               name: "Test again",
               cpf: "07563801030",
-              email: "example2@test.com",
-              password: "12345678",
-              confirm_password: "12345678",
-              birth_day: new Date("01/01/2000"),
             };
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
-              body: JSON.stringify(user),
+              body: JSON.stringify(cpfExistUser),
             });
 
             expect(response.status).toBe(409);
@@ -87,23 +94,21 @@ describe("POST to /api/v1/users", () => {
             const body = await response.json();
 
             expect(body.name).toBe("DuplicateError");
-            expect(body.message).toBe("This CPF is already in use");
-            expect(body.action).toBe("Enter in your account with this CPF");
+            expect(body.message).toBe("This cpf is already in use");
+            expect(body.action).toBe("Try send another cpf");
             expect(body.status_code).toBe(409);
           });
           test("Email", async () => {
-            const user = {
+            const emailExistUser = {
+              ...user,
               name: "Test again",
               cpf: "06124688018",
               email: "example@test.com",
-              password: "12345678",
-              confirm_password: "12345678",
-              birth_day: new Date("01/01/2000"),
             };
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
-              body: JSON.stringify(user),
+              body: JSON.stringify(emailExistUser),
             });
 
             expect(response.status).toBe(409);
@@ -112,25 +117,21 @@ describe("POST to /api/v1/users", () => {
 
             expect(body.name).toBe("DuplicateError");
             expect(body.message).toBe("This email is already in use");
-            expect(body.action).toBe(
-              "Enter with you email or send another email",
-            );
+            expect(body.action).toBe("Try send another email");
             expect(body.status_code).toBe(409);
           });
         });
         describe("Without", () => {
           test("Name", async () => {
-            const user = {
-              cpf: "07563801030",
-              email: "email@example.co",
-              password: "12345678",
-              confirm_password: "12345678",
-              birth_day: new Date("01/01/2000"),
+            const withoutNameUser = {
+              ...user,
             };
+
+            delete withoutNameUser.name;
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
-              body: JSON.stringify(user),
+              body: JSON.stringify(withoutNameUser),
             });
 
             expect(response.status).toBe(400);
@@ -143,17 +144,15 @@ describe("POST to /api/v1/users", () => {
             expect(body.status_code).toBe(400);
           });
           test("CPF", async () => {
-            const user = {
-              name: "Teste",
-              email: "email@example.co",
-              password: "12345678",
-              confirm_password: "12345678",
-              birth_day: new Date("01/01/2000"),
+            const withoutCpfUser = {
+              ...user,
             };
+
+            delete withoutCpfUser.cpf;
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
-              body: JSON.stringify(user),
+              body: JSON.stringify(withoutCpfUser),
             });
 
             expect(response.status).toBe(400);
@@ -166,17 +165,15 @@ describe("POST to /api/v1/users", () => {
             expect(body.status_code).toBe(400);
           });
           test("Email", async () => {
-            const user = {
-              name: "Teste",
-              cpf: "07563801030",
-              password: "12345678",
-              confirm_password: "12345678",
-              birth_day: new Date("01/01/2000"),
+            const withoutEmailUser = {
+              ...user,
             };
+
+            delete withoutEmailUser.email;
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
-              body: JSON.stringify(user),
+              body: JSON.stringify(withoutEmailUser),
             });
 
             expect(response.status).toBe(400);
@@ -188,41 +185,16 @@ describe("POST to /api/v1/users", () => {
             expect(body.action).toBe("Try adjust your data and try again");
             expect(body.status_code).toBe(400);
           });
-          test("Confirm password", async () => {
-            const user = {
-              name: "Teste",
-              cpf: "07563801030",
-              email: "email@example.co",
-              password: "12345678",
-              birth_day: new Date("01/01/2000"),
-            };
-
-            const response = await fetch("http://localhost:3000/api/v1/users", {
-              method: "POST",
-              body: JSON.stringify(user),
-            });
-
-            expect(response.status).toBe(400);
-
-            const body = await response.json();
-
-            expect(body.name).toBe("ValidationError");
-            expect(body.message).toBe('"confirm_password" is required');
-            expect(body.action).toBe("Try adjust your data and try again");
-            expect(body.status_code).toBe(400);
-          });
           test("Password", async () => {
-            const user = {
-              name: "Teste",
-              cpf: "07563801030",
-              email: "email@example.co",
-              confirm_password: "12345678",
-              birth_day: new Date("01/01/2000"),
+            const withoutPasswordUser = {
+              ...user,
             };
+
+            delete withoutPasswordUser.password;
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
-              body: JSON.stringify(user),
+              body: JSON.stringify(withoutPasswordUser),
             });
 
             expect(response.status).toBe(400);
@@ -234,18 +206,37 @@ describe("POST to /api/v1/users", () => {
             expect(body.action).toBe("Try adjust your data and try again");
             expect(body.status_code).toBe(400);
           });
-          test("Birthday", async () => {
-            const user = {
-              name: "Teste",
-              cpf: "07563801030",
-              email: "email@example.co",
-              password: "12345678",
-              confirm_password: "12345678",
+          test("Confirm password", async () => {
+            const withoutConfirmPasswordUser = {
+              ...user,
             };
+
+            delete withoutConfirmPasswordUser.confirm_password;
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
-              body: JSON.stringify(user),
+              body: JSON.stringify(withoutConfirmPasswordUser),
+            });
+
+            expect(response.status).toBe(400);
+
+            const body = await response.json();
+
+            expect(body.name).toBe("ValidationError");
+            expect(body.message).toBe('"confirm_password" is required');
+            expect(body.action).toBe("Try adjust your data and try again");
+            expect(body.status_code).toBe(400);
+          });
+          test("Birthday", async () => {
+            const withoutBirthdayUser = {
+              ...user,
+            };
+
+            delete withoutBirthdayUser.birth_day;
+
+            const response = await fetch("http://localhost:3000/api/v1/users", {
+              method: "POST",
+              body: JSON.stringify(withoutBirthdayUser),
             });
 
             expect(response.status).toBe(400);

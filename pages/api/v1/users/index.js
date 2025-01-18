@@ -20,7 +20,7 @@ async function handlerGet(req, res) {
       action: "Add an valid user ID in request.",
     });
 
-  const user = await users.getUserById(userId);
+  const user = await users.getUser("id", userId);
 
   if (!user) return res.status(404).end();
 

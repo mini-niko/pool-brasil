@@ -31,3 +31,7 @@ describe("GET to /api/v1/migrations", () => {
     });
   });
 });
+
+afterAll(async () => {
+  await orchestrator.upMigrations();
+});

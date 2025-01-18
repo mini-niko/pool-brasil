@@ -7,6 +7,14 @@ let mockUser = {
   password: "12345678",
   confirm_password: "12345678",
   birth_day: new Date("01/01/2000"),
+  address: {
+    state: "SC",
+    city: "Xanxerê",
+    street: "Avenida Brasil",
+    number: 1,
+    complement: "apto 4",
+    reference: "Ao lado do mercado XXX",
+  },
 };
 
 beforeAll(async () => {

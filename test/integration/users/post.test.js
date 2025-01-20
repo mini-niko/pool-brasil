@@ -160,7 +160,7 @@ describe("POST to /api/v1/users", () => {
             const body = await response.json();
 
             expect(body.name).toBe("ValidationError");
-            expect(body.message).toBe('"cpf" is required');
+            expect(body.message).toBe('"cpf" is not allowed to be empty');
             expect(body.action).toBe("Try adjust your data and try again");
             expect(body.status_code).toBe(400);
           });

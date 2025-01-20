@@ -3,6 +3,8 @@ import userValidation from "./validation/user";
 import { cpf } from "cpf-cnpj-validator";
 
 async function createUser(userData = {}) {
+  userData.cpf = cpf.format(userData.cpf).replaceAll(".", "").replace("-", "");
+
   userValidation.validate(userData);
   await userValidation.alreadyInUse(userData);
 
@@ -15,7 +17,7 @@ async function createUser(userData = {}) {
     VALUES ((SELECT id FROM new_user), $6, $7, $8, $9, $10, $11) RETURNING *;`,
     [
       userData.name,
-      cpf.format(userData.cpf).replaceAll(".", "").replace("-", ""),
+      userData.cpf,
       userData.email,
       userData.password,
       userData.birth_day,

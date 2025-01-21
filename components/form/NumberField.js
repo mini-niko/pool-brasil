@@ -1,4 +1,4 @@
-export default ({ field, title, number, setNumber }) => {
+function NumberField({ field, title, number, setNumber }) {
   return (
     <div className="flex flex-col items-start justify-start">
       <label className="text-sm" htmlFor={field}>
@@ -8,10 +8,12 @@ export default ({ field, title, number, setNumber }) => {
         className="text-sm w-24 p-1 rounded-md"
         type="number"
         value={number}
-        onChange={(e) => setNumber(e.target.value)}
+        onChange={setNumber}
         id={field}
         name={field}
       />
     </div>
   );
-};
+}
+
+export default NumberField;

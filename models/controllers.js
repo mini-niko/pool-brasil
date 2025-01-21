@@ -15,6 +15,8 @@ function handlerError(err, req, res) {
 }
 
 async function parseJSON(req, res, next) {
+  console.log(req.body);
+
   if (typeof req.body === "string" && req.body.length > 1)
     req.body = JSON.parse(req.body);
 

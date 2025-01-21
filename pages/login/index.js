@@ -1,8 +1,9 @@
 import EmailField from "components/form/EmailField";
 import PasswordField from "components/form/PasswordField";
+import Link from "next/link";
 import { useState } from "react";
 
-function login() {
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -48,13 +49,13 @@ function login() {
 
         <p>
           Não possui uma conta?{" "}
-          <a className="font-semibold underline" href="/register">
+          <Link className="font-semibold underline" href="/register">
             Crie uma agora!
-          </a>
+          </Link>
         </p>
       </form>
     </div>
   );
 }
 
-export default login;
+export default Login;

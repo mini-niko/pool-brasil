@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default ({ field, title, password, setPassword }) => {
+function PasswordField({ field, title, password, setPassword }) {
   const [seePassword, setSeePassword] = useState("password");
 
   return (
@@ -12,7 +12,7 @@ export default ({ field, title, password, setPassword }) => {
         className="text-sm w-56 p-1 rounded-md"
         type={seePassword}
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={setPassword}
         id={field}
         name={field}
       />
@@ -29,4 +29,6 @@ export default ({ field, title, password, setPassword }) => {
       </button>
     </div>
   );
-};
+}
+
+export default PasswordField;

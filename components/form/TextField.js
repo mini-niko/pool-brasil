@@ -1,4 +1,4 @@
-export default ({ field, title, text, setText }) => {
+function TextField({ field, title, text, setText }) {
   return (
     <div className="flex flex-col">
       <label className="text-sm" htmlFor={field}>
@@ -8,10 +8,12 @@ export default ({ field, title, text, setText }) => {
         className="text-sm w-56 p-1 rounded-md"
         type="text"
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={setText}
         id={field}
         name={field}
       />
     </div>
   );
-};
+}
+
+export default TextField;

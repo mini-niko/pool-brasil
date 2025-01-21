@@ -1,28 +1,33 @@
-import { data } from "autoprefixer";
 import DateField from "components/form/DateField";
 import EmailField from "components/form/EmailField";
 import NumberField from "components/form/NumberField";
 import PasswordField from "components/form/PasswordField";
 import StateField from "components/form/StateField";
 import TextField from "components/form/TextField";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-function register() {
+function Register() {
   const router = useRouter();
 
-  const [name, setName] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [birthDay, setBirthDay] = useState("");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
-  const [street, setStreet] = useState("");
-  const [number, setNumber] = useState("");
-  const [complement, setComplement] = useState("");
-  const [reference, setReference] = useState("");
+  const [user, setUser] = useState({
+    name: "",
+    cpf: "",
+    email: "",
+    password: "",
+    confirm_password: "",
+    birth_day: "",
+  });
+
+  const [address, setAddress] = useState({
+    state: "",
+    city: "",
+    street: "",
+    number: "",
+    complement: "",
+    reference: "",
+  });
 
   const [disabled, setDisabled] = useState(false);
 
@@ -31,31 +36,37 @@ function register() {
 
     setDisabled(!disabled);
 
-    const user = {
-      name,
-      cpf,
-      email,
-      password,
-      confirm_password: confirmPassword,
-      birth_day: birthDay,
-      address: {
-        state,
-        city,
-        street,
-        number,
-        complement,
-        reference,
-      },
+    const userRequest = {
+      ...user,
+      address,
     };
 
     const res = await fetch("/api/v1/users", {
       method: "POST",
-      body: JSON.stringify(user),
+      body: JSON.stringify(userRequest),
     });
 
     if (res.status === 201) return router.push("/login");
-
+    else if (res.json) console.log(await res.json());
     setDisabled(false);
+  }
+
+  function handleUserChange(e) {
+    const { name, value } = e.target;
+
+    setUser((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
+  }
+
+  function handleAddressChange(e) {
+    const { name, value } = e.target;
+
+    setAddress((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
   }
 
   return (
@@ -74,70 +85,70 @@ function register() {
               <TextField
                 field={"name"}
                 title={"Nome completo"}
-                text={name}
-                setText={setName}
+                text={user.name}
+                setText={handleUserChange}
               />
               <TextField
                 field={"cpf"}
                 title={"CPF"}
-                text={cpf}
-                setText={setCpf}
+                text={user.cpf}
+                setText={handleUserChange}
               />
-              <EmailField email={email} setEmail={setEmail} />
+              <EmailField email={user.email} setEmail={handleUserChange} />
               <PasswordField
                 field={"password"}
                 title={"Senha"}
-                password={password}
-                setPassword={setPassword}
+                password={user.password}
+                setPassword={handleUserChange}
               />
               <PasswordField
                 field={"confirm_password"}
                 title={"Confirmar Senha"}
-                password={confirmPassword}
-                setPassword={setConfirmPassword}
+                password={user.confirm_password}
+                setPassword={handleUserChange}
               />
               <DateField
                 field={"birth_day"}
                 title={"Data de Nascimento"}
-                date={birthDay}
-                setDate={setBirthDay}
+                date={user.birth_day}
+                setDate={handleUserChange}
               />
             </div>
             <div className="flex flex-col justify-start items-start gap-2">
               <StateField
                 field={"state"}
                 title={"Estado"}
-                setState={setState}
+                setState={handleAddressChange}
               />
               <TextField
                 field={"city"}
                 title={"Cidade"}
-                text={city}
-                setText={setCity}
+                text={address.city}
+                setText={handleAddressChange}
               />
               <TextField
                 field={"street"}
                 title={"Endereço"}
-                text={street}
-                setText={setStreet}
+                text={address.street}
+                setText={handleAddressChange}
               />
               <NumberField
                 field={"number"}
                 title={"Número"}
-                number={number}
-                setNumber={setNumber}
+                number={address.number}
+                setNumber={handleAddressChange}
               />
               <TextField
                 field={"complement"}
                 title={"Complemento"}
-                text={complement}
-                setText={setComplement}
+                text={address.complement}
+                setText={handleAddressChange}
               />
               <TextField
                 field={"reference"}
                 title={"Referência"}
-                text={reference}
-                setText={setReference}
+                text={address.reference}
+                setText={handleAddressChange}
               />
             </div>
           </div>
@@ -152,13 +163,13 @@ function register() {
 
         <p>
           Já possui uma conta?{" "}
-          <a className="font-semibold underline" href="/login">
+          <Link className="font-semibold underline" href="/login">
             Entre na conta
-          </a>
+          </Link>
         </p>
       </form>
     </div>
   );
 }
 
-export default register;
+export default Register;

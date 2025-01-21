@@ -1,4 +1,4 @@
-export default ({ email, setEmail }) => {
+function EmailField({ email, setEmail }) {
   return (
     <div className="flex flex-col">
       <label className="text-sm" htmlFor="email">
@@ -8,10 +8,12 @@ export default ({ email, setEmail }) => {
         className="text-sm w-56 p-1 rounded-md"
         type="text"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={setEmail}
         id="email"
         name="email"
       />
     </div>
   );
-};
+}
+
+export default EmailField;

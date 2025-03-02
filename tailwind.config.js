@@ -2,11 +2,7 @@
 module.exports = {
   content: ["./pages/**/*.js"],
   theme: {
-    extend: {
-      fontFamily: {
-        sans: ["Vice City Sans", "sans-serif"],
-      },
-    },
+    extend: {},
     colors: {
       "pool-white": "#FFFFFF",
       "pool-black": "#2D3133",

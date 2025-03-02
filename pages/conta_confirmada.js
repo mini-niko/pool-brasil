@@ -20,8 +20,20 @@ function ContaConfirmada() {
         justify="center"
         className="z-10 hidden md:flex absolute"
       >
-        <Image className="w-max md:w-72" src={symbol.src} alt="" />
-        <Image className="w-max md:w-72" src={symbol.src} alt="" />
+        <Image
+          height={symbol.height}
+          width={symbol.width}
+          className="w-max md:w-72"
+          src={symbol.src}
+          alt=""
+        />
+        <Image
+          height={symbol.height}
+          width={symbol.width}
+          className="w-max md:w-72"
+          src={symbol.src}
+          alt=""
+        />
       </Box>
       <Box
         box={true}

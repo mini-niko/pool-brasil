@@ -156,7 +156,13 @@ function Registro() {
             onClick={() => setPageIndex(0)}
             className="py-4 px-8 md:py-3 md:px-6 md:text-sm text-pool-dark"
           >
-            <Image className="h-6" src="/icons/arrow-left.svg" alt="" />
+            <Image
+              height={500}
+              width={500}
+              className="h-6 w-6"
+              src="/icons/arrow-left.svg"
+              alt=""
+            />
           </button>
           <Box box={true} flex={true} color={"dark"} className="rounded-md">
             <button
@@ -303,7 +309,13 @@ function Registro() {
             onClick={() => setPageIndex(1)}
             className="py-4 px-8 md:py-3 md:px-6 md:text-sm text-pool-dark"
           >
-            <Image className="h-6" src="/icons/arrow-left.svg" alt="" />
+            <Image
+              height={500}
+              width={500}
+              className="h-6 w-6"
+              src="/icons/arrow-left.svg"
+              alt=""
+            />
           </button>
           <Box box={true} flex={true} color={"dark"} className="rounded-md">
             <button
@@ -373,7 +385,13 @@ function Registro() {
             onClick={() => setPageIndex(2)}
             className="py-4 px-8 md:py-3 md:px-6 md:text-sm text-pool-dark"
           >
-            <Image className="h-6" src="/icons/arrow-left.svg" alt="" />
+            <Image
+              height={500}
+              width={500}
+              className="h-6 w-6"
+              src="/icons/arrow-left.svg"
+              alt=""
+            />
           </button>
           <Box box={true} flex={true} color={"dark"} className="rounded-md">
             <button
@@ -410,8 +428,20 @@ function Registro() {
         justify="center"
         className="z-10 hidden md:flex absolute"
       >
-        <Image className="w-max md:w-72" src={symbol.src} alt="" />
-        <Image className="w-max md:w-72" src={symbol.src} alt="" />
+        <Image
+          height={symbol.height}
+          width={symbol.width}
+          className="w-max md:w-72"
+          src={symbol.src}
+          alt=""
+        />
+        <Image
+          height={symbol.height}
+          width={symbol.width}
+          className="w-max md:w-72"
+          src={symbol.src}
+          alt=""
+        />
       </Box>
       <Box
         box={true}

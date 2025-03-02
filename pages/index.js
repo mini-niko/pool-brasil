@@ -25,9 +25,15 @@ function Index() {
               color="light"
               direction="col"
               items="center"
-              gap={12}
+              gap={8}
             >
-              <Image className="h-24" src={calendarIcon.src} alt="" />
+              <Image
+                height={calendarIcon.height}
+                width={calendarIcon.width}
+                className="h-24 w-auto"
+                src={calendarIcon.src}
+                alt=""
+              />
               <p className="h-24 font-bold text-pool-white text-2xl gap-12">
                 Agendamento
               </p>
@@ -53,9 +59,15 @@ function Index() {
               color="light"
               direction="col"
               items="center"
-              gap={12}
+              gap={8}
             >
-              <Image className="h-24" src={clockRotateIcon.src} alt="" />
+              <Image
+                height={100}
+                width={100}
+                className="h-24 w-auto"
+                src={clockRotateIcon.src}
+                alt=""
+              />
               <p className="h-24 font-bold text-center text-pool-white text-2xl">
                 Histórico de
                 <br />

@@ -12,6 +12,7 @@ const customFilters = {
       : helpers.error("any.invalid");
   },
   utcString(value, helpers) {
+    if (!value) return;
     return /^[A-Za-zÀ-ÿ0-9.,\s]+$/.test(value)
       ? value
       : helpers.error("any.invalid");
@@ -41,8 +42,8 @@ const userSchema = Joi.object({
       .required()
       .custom(customFilters.utcString),
     number: Joi.number().integer().min(0).max(999999).required(),
-    complement: Joi.string().max(20).custom(customFilters.utcString),
-    reference: Joi.string().max(40).custom(customFilters.utcString),
+    complement: Joi.string().min(0).max(20).custom(customFilters.utcString),
+    reference: Joi.string().min(0).max(40).custom(customFilters.utcString),
   }),
 });
 

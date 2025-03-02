@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "Vice City Sans";
+  src:
+    url("/fonts/vice-city/vice-city-sans-bold.woff2") format("woff2"),
+    url("/fonts/vice-city/vice-city-sans-bold.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Vice City Sans";
+  src:
+    url("/fonts/vice-city/vice-city-sans-light.woff2") format("woff2"),
+    url("/fonts/vice-city/vice-city-sans-light.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+}

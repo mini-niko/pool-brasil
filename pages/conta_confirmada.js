@@ -1,7 +1,9 @@
+import Image from "next/image";
 import Box from "./interface/components/Box";
 import symbol from "public/principal-symbol.svg";
+import Link from "next/link";
 
-function confirmarConta() {
+function ContaConfirmada() {
   return (
     <Box
       box={true}
@@ -18,8 +20,8 @@ function confirmarConta() {
         justify="center"
         className="z-10 hidden md:flex absolute"
       >
-        <img className="w-max md:w-72" src={symbol.src} />
-        <img className="w-max md:w-72" src={symbol.src} />
+        <Image className="w-max md:w-72" src={symbol.src} alt="" />
+        <Image className="w-max md:w-72" src={symbol.src} alt="" />
       </Box>
       <Box
         box={true}
@@ -38,9 +40,9 @@ function confirmarConta() {
           Sua conta foi confirmada com sucesso!
         </p>
         <p className="md:text-sm">
-          <a href="/" className="text-pool-dark">
+          <Link href="/" className="text-pool-dark">
             Clique aqui
-          </a>{" "}
+          </Link>{" "}
           para ir à página principal.
         </p>
       </Box>
@@ -48,4 +50,4 @@ function confirmarConta() {
   );
 }
 
-export default confirmarConta;
+export default ContaConfirmada;

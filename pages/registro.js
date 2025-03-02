@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import Box from "./interface/components/Box";
 import symbol from "public/principal-symbol.svg";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import Image from "next/image";
 
-function registro() {
+function Registro() {
   const router = useRouter();
 
   const [pageIndex, setPageIndex] = useState(0);
@@ -72,9 +74,9 @@ function registro() {
       </Box>
       <p className="md:text-sm">
         <span className="text-pool-dark">Já possui uma conta? </span>
-        <a className="underline" href="/login">
+        <Link className="underline" href="/login">
           Entrar agora
-        </a>
+        </Link>
       </p>
     </>,
     <>
@@ -154,7 +156,7 @@ function registro() {
             onClick={() => setPageIndex(0)}
             className="py-4 px-8 md:py-3 md:px-6 md:text-sm text-pool-dark"
           >
-            <img className="h-6" src="/icons/arrow-left.svg"></img>
+            <Image className="h-6" src="/icons/arrow-left.svg" alt="" />
           </button>
           <Box box={true} flex={true} color={"dark"} className="rounded-md">
             <button
@@ -168,9 +170,9 @@ function registro() {
       </form>
       <p className="md:text-sm">
         <span className="text-pool-dark">Já possui uma conta? </span>
-        <a className="underline" href="/login">
+        <Link className="underline" href="/login">
           Entrar agora
-        </a>
+        </Link>
       </p>
     </>,
     <>
@@ -250,9 +252,15 @@ function registro() {
               }}
               className="focus:outline-none rounded-md text-sm drop-shadow-xl w-64 px-4 py-2 md:px-3 md:py-1 md:text-xs shadow-pool-light/25 text-pool-dark"
             >
-              <option value="">-- Selecione um estado --</option>
+              <option key="" value="">
+                -- Selecione um estado --
+              </option>
               {states.map((sail) => {
-                return <option value={sail}>{sail}</option>;
+                return (
+                  <option key={sail} value={sail}>
+                    {sail}
+                  </option>
+                );
               })}
             </select>
           </Box>
@@ -267,9 +275,15 @@ function registro() {
               }}
               className="focus:outline-none rounded-md text-sm drop-shadow-xl w-64 px-4 py-2 md:px-3 md:py-1 md:text-xs shadow-pool-light/25 text-pool-dark"
             >
-              <option value="">-- Selecione uma cidade --</option>
+              <option key="" value="">
+                -- Selecione uma cidade --
+              </option>
               {cities.map((name) => {
-                return <option value={name}>{name}</option>;
+                return (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                );
               })}
             </select>
           </Box>
@@ -289,7 +303,7 @@ function registro() {
             onClick={() => setPageIndex(1)}
             className="py-4 px-8 md:py-3 md:px-6 md:text-sm text-pool-dark"
           >
-            <img className="h-6" src="/icons/arrow-left.svg"></img>
+            <Image className="h-6" src="/icons/arrow-left.svg" alt="" />
           </button>
           <Box box={true} flex={true} color={"dark"} className="rounded-md">
             <button
@@ -303,9 +317,9 @@ function registro() {
       </form>
       <p className="md:text-sm">
         <span className="text-pool-dark">Já possui uma conta? </span>
-        <a className="underline" href="/login">
+        <Link className="underline" href="/login">
           Entrar agora
-        </a>
+        </Link>
       </p>
     </>,
     <>
@@ -359,7 +373,7 @@ function registro() {
             onClick={() => setPageIndex(2)}
             className="py-4 px-8 md:py-3 md:px-6 md:text-sm text-pool-dark"
           >
-            <img className="h-6" src="/icons/arrow-left.svg"></img>
+            <Image className="h-6" src="/icons/arrow-left.svg" alt="" />
           </button>
           <Box box={true} flex={true} color={"dark"} className="rounded-md">
             <button
@@ -373,9 +387,9 @@ function registro() {
       </form>
       <p className="md:text-sm">
         <span className="text-pool-dark">Já possui uma conta? </span>
-        <a className="underline" href="/login">
+        <Link className="underline" href="/login">
           Entrar agora
-        </a>
+        </Link>
       </p>
     </>,
   ];
@@ -396,8 +410,8 @@ function registro() {
         justify="center"
         className="z-10 hidden md:flex absolute"
       >
-        <img className="w-max md:w-72" src={symbol.src} />
-        <img className="w-max md:w-72" src={symbol.src} />
+        <Image className="w-max md:w-72" src={symbol.src} alt="" />
+        <Image className="w-max md:w-72" src={symbol.src} alt="" />
       </Box>
       <Box
         box={true}
@@ -415,4 +429,4 @@ function registro() {
   );
 }
 
-export default registro;
+export default Registro;

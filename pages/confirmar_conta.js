@@ -1,7 +1,8 @@
+import Image from "next/image";
 import Box from "./interface/components/Box";
 import symbol from "public/principal-symbol.svg";
 
-function confirmarConta() {
+function ConfirmarConta() {
   return (
     <Box
       box={true}
@@ -18,8 +19,8 @@ function confirmarConta() {
         justify="center"
         className="z-10 hidden md:flex absolute"
       >
-        <img className="w-max md:w-72" src={symbol.src} />
-        <img className="w-max md:w-72" src={symbol.src} />
+        <Image className="w-max md:w-72" src={symbol.src} alt="" />
+        <Image className="w-max md:w-72" src={symbol.src} alt="" />
       </Box>
       <Box
         box={true}
@@ -47,4 +48,4 @@ function confirmarConta() {
   );
 }
 
-export default confirmarConta;
+export default ConfirmarConta;

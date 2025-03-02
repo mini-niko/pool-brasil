@@ -3,8 +3,9 @@ import NavigationBar from "./interface/components/NavigationBar";
 import calendarIcon from "public/icons/calendar.svg";
 import clockRotateIcon from "public/icons/clock-rotate.svg";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
-function index() {
+function Index() {
   const router = useRouter();
 
   return (
@@ -26,7 +27,7 @@ function index() {
               items="center"
               gap={12}
             >
-              <img className="h-24" src={calendarIcon.src} />
+              <Image className="h-24" src={calendarIcon.src} alt="" />
               <p className="h-24 font-bold text-pool-white text-2xl gap-12">
                 Agendamento
               </p>
@@ -54,7 +55,7 @@ function index() {
               items="center"
               gap={12}
             >
-              <img className="h-24" src={clockRotateIcon.src} />
+              <Image className="h-24" src={clockRotateIcon.src} alt="" />
               <p className="h-24 font-bold text-center text-pool-white text-2xl">
                 Histórico de
                 <br />
@@ -80,4 +81,4 @@ function index() {
   );
 }
 
-export default index;
+export default Index;

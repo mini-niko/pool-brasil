@@ -1,7 +1,9 @@
+import Image from "next/image";
 import Box from "./interface/components/Box";
 import symbol from "public/principal-symbol.svg";
+import Link from "next/link";
 
-function login() {
+function Login() {
   return (
     <Box
       box={true}
@@ -18,8 +20,8 @@ function login() {
         justify="center"
         className="z-10 hidden md:flex absolute"
       >
-        <img className="w-max md:w-72" src={symbol.src} />
-        <img className="w-max md:w-72" src={symbol.src} />
+        <Image className="w-max md:w-72" src={symbol.src} alt="" />
+        <Image className="w-max md:w-72" src={symbol.src} alt="" />
       </Box>
       <Box
         box={true}
@@ -84,13 +86,13 @@ function login() {
         </form>
         <p className="md:text-sm">
           <span className="text-pool-dark">Não possui uma conta? </span>
-          <a className="underline" href="/registro">
+          <Link className="underline" href="/registro">
             Criar agora
-          </a>
+          </Link>
         </p>
       </Box>
     </Box>
   );
 }
 
-export default login;
+export default Login;

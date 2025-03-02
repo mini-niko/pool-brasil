@@ -1,11 +1,14 @@
+import classNames from "classnames";
+
 const colors = {
-  light: "bg-pool-light shadow-pool-light/25",
-  white: "bg-pool-white shadow-pool-light/25",
+  dark: "bg-pool-dark shadow-pool-dark/25",
+  light: "bg-pool-light shadow-pool-dark/25",
+  white: "bg-pool-white shadow-pool-dark/25",
 };
 
 function Box({
   children,
-  className,
+  className = "",
   flex,
   direction = "row",
   items = "start",
@@ -14,21 +17,23 @@ function Box({
   box,
   color,
 }) {
-  const boxStyle = box ? "rounded-2xl shadow-2xl w-fit h-fit" : "";
+  const boxStyle = box ? "rounded-2xl shadow-2xl" : "";
 
   const boxColor = color ? colors[color] : "";
 
   const flexStyle = flex
-    ? `flex flex-${direction} items-${items} justify-${justify} gap-${gap}`
+    ? classNames({
+        flex: true,
+        [`items-${items}`]: true,
+        [`justify-${justify}`]: true,
+        [`flex-${direction}`]: true,
+        [`gap-${gap}`]: true,
+      })
     : "";
 
-  console.log(flexStyle);
+  const finalClassName = classNames(boxStyle, boxColor, flexStyle, className);
 
-  return (
-    <div className={`${boxStyle} ${boxColor} ${flexStyle} ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={finalClassName}>{children}</div>;
 }
 
 export default Box;

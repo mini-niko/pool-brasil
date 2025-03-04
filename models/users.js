@@ -50,6 +50,17 @@ async function getUser(key, value) {
   return formatUser(response.rows[0]);
 }
 
+async function getUserByLogin(email, password) {
+  const response = await database.query(
+    `SELECT u.*, a.* FROM users u
+     LEFT JOIN addresses a ON u.id = a.user_id
+     WHERE u.email = $1 AND u.password = $2`,
+    [email, password],
+  );
+
+  return formatUser(response.rows[0]);
+}
+
 function formatUser(data) {
   if (!data) return;
 
@@ -75,6 +86,7 @@ function formatUser(data) {
 }
 
 const users = {
+  getUserByLogin,
   createUser,
   getUser,
 };

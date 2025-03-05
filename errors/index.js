@@ -31,3 +31,14 @@ export class ValidationError extends Error {
     this.stack = stack;
   }
 }
+
+export class UnauthorizedError extends Error {
+  constructor({ message, action, statusCode, stack }) {
+    super();
+    this.name = "UnauthorizedError";
+    this.message = message || "You don't have authorization to do this.";
+    this.action = action || "Get an authorization.";
+    this.statusCode = statusCode || 401;
+    this.stack = stack;
+  }
+}

@@ -1,6 +1,7 @@
 import localFont from "next/font/local";
 import Head from "next/head";
 import "styles/global.css";
+import { UserProvider } from "pages/interface/hooks/useUser.js";
 
 const viceCityFont = localFont({
   src: [
@@ -18,16 +19,18 @@ const viceCityFont = localFont({
 });
 
 export default function RootLayout({ Component, pageProps }) {
+  const className = `min-h-screen overflow-x-hidden text-pool-black ${viceCityFont.className}`;
+
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <div className="min-h-screen overflow-x-hidden">
-        <div className={`text-pool-black ${viceCityFont.className}`}>
+      <UserProvider>
+        <div className={className}>
           <Component {...pageProps} />
         </div>
-      </div>
+      </UserProvider>
     </>
   );
 }

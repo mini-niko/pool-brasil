@@ -42,8 +42,12 @@ describe("POST to /api/v1/sessions", () => {
           }),
         });
 
+        expect(response.status).toBe(201);
+
         const body = await response.json();
         const responseToken = body.token;
+
+        console.log(responseToken);
 
         expect(typeof responseToken).toBe("string");
         expect(responseToken.length).toBe(32);
@@ -57,13 +61,55 @@ describe("POST to /api/v1/sessions", () => {
 
         const sessionCookie = orchestrator.parseCookiesFromResponse(response);
 
-        console.log(sessionCookie);
-
         expect(sessionCookie.name).toBe("sessionToken");
         expect(sessionCookie.value).toBe(responseToken);
         expect(sessionCookie.httpOnly).toBeTruthy();
         expect(sessionCookie.maxAge).toBe(parseInt(process.env.SESSION_TIME));
         expect(sessionCookie.secure).toBeTruthy();
+      });
+
+      test("Invalid login", async () => {
+        const responseWithWrongEmail = await fetch(
+          "http://localhost:3000/api/v1/sessions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: "invalid_mail@email.com",
+              password: mockUser.password,
+            }),
+          },
+        );
+
+        const bodyWithWrongEmail = await responseWithWrongEmail.json();
+
+        const responseWithWrongPassword = await fetch(
+          "http://localhost:3000/api/v1/sessions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: mockUser.email,
+              password: "invalid_password",
+            }),
+          },
+        );
+
+        const bodyWithWrongPassword = await responseWithWrongPassword.json();
+
+        expect(bodyWithWrongEmail).toEqual(bodyWithWrongPassword);
+        expect(bodyWithWrongEmail.name).toBe("UnauthorizedError");
+        expect(bodyWithWrongEmail.message).toBe(
+          "The email and/or password don't match any account.",
+        );
+        expect(bodyWithWrongEmail.action).toBe(
+          "Send an email and password valid.",
+        );
+        expect(bodyWithWrongEmail.status_code).toBe(401);
       });
     });
   });

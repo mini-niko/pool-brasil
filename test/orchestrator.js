@@ -2,6 +2,7 @@ import retry from "async-retry";
 import database from "infra/database";
 import migrator from "infra/migrator";
 import redis from "infra/redis";
+import sessions from "models/sessions";
 import users from "models/users";
 import { parseSetCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -32,6 +33,20 @@ async function cleanRedis() {
   await redis.flush();
 }
 
+async function setSession(user) {
+  const setInRedis = JSON.stringify({
+    id: user.id,
+    name: user.name,
+    features: user.features,
+  });
+
+  const token = "123456789";
+
+  await redis.set(`session:${token}`, setInRedis);
+
+  return token;
+}
+
 async function upMigrations() {
   await migrator.runPendingMigrations();
 }
@@ -50,6 +65,7 @@ const orchestrator = {
   waitForAllServices,
   cleanDatabase,
   cleanRedis,
+  setSession,
   upMigrations,
   setMockUser,
   parseCookiesFromResponse,

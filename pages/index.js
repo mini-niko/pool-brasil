@@ -4,16 +4,19 @@ import calendarIcon from "public/icons/calendar.svg";
 import clockRotateIcon from "public/icons/clock-rotate.svg";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import useUser from "./interface/hooks/useUser";
 
 function Index() {
   const router = useRouter();
+
+  const { user } = useUser();
 
   return (
     <>
       <NavigationBar />
       <main className="py-12 px-16 flex flex-col items-center gap-12">
         <Box flex={true} direction="col" items="center" gap={3}>
-          <h1 className="font-bold text-3xl">OLÁ!</h1>
+          <h1 className="font-bold text-3xl">OLÁ {user?.name}!</h1>
           <h2 className="text-xl text-center">Como podemos te ajudar hoje?</h2>
         </Box>
         <Box flex={true} justify="center" gap={12} className="flex-wrap">

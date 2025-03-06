@@ -19,7 +19,7 @@ export const config = {
   matcher: ["/((?!_next/static|va/|favicon|manifest).*)"],
 };
 
-export default async (req) => {
+async function middleware(req) {
   const reqPath = req.nextUrl.pathname;
   const token = req.cookies.get("sessionToken")?.value;
 
@@ -46,7 +46,7 @@ export default async (req) => {
   }
 
   return res;
-};
+}
 
 async function getUser(token, baseUrl) {
   if (!token) return null;
@@ -76,3 +76,5 @@ function getInfoToResponse(isPrivate, isPublic, user, token) {
 
   return { redirectRoute, clearCookies };
 }
+
+export default middleware;

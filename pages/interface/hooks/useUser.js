@@ -16,7 +16,7 @@ export const UserProvider = ({ children }) => {
     const user = await request.json();
 
     setUser(user);
-  });
+  }, []);
 
   const userContextValue = {
     user,

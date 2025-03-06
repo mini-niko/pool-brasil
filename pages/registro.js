@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import Box from "./interface/components/Box";
-import symbol from "public/principal-symbol.svg";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import Image from "next/image";
 import Button from "./interface/components/Button";
 import TitleSubtitle from "./interface/components/TitleSubtitle";
 import DefaultContainer from "./interface/components/DefaultContainer";

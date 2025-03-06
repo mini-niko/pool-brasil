@@ -25,9 +25,9 @@ async function search(key) {
   return query;
 }
 
-async function flush(params) {
+async function flush() {
   const client = await getClient();
-  const query = await client.flushAll();
+  await client.flushAll();
 }
 
 const redis = {

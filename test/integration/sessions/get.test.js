@@ -1,5 +1,3 @@
-import redis from "infra/redis";
-import { headers } from "next/headers";
 import orchestrator from "test/orchestrator.js";
 
 let mockUser = {

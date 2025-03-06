@@ -2,7 +2,6 @@ import retry from "async-retry";
 import database from "infra/database";
 import migrator from "infra/migrator";
 import redis from "infra/redis";
-import sessions from "models/sessions";
 import users from "models/users";
 import { parseSetCookie } from "next/dist/compiled/@edge-runtime/cookies";
 

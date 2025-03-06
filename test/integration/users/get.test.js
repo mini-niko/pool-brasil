@@ -65,7 +65,7 @@ describe("GET to /api/v1/users", () => {
         expect(body).toEqual({
           name: "ValidationError",
           message: '"id" must be and uuid id.',
-          action: "Try send an valid id",
+          action: "Try send an valid id.",
           status_code: 400,
         });
       });

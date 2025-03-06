@@ -54,7 +54,7 @@ function validID(id) {
   if (!regex.test(id))
     throw new ValidationError({
       message: '"id" must be and uuid id.',
-      action: "Try send an valid id",
+      action: "Try send an valid id.",
     });
 }
 
@@ -95,27 +95,6 @@ async function alreadyInUse(userData) {
       action: `Try send another ${checks[0]}`,
     });
   }
-
-  // const nameInUse = (await users.getUserByName(userData.name)) !== undefined;
-  // if (nameInUse)
-  //   throw new DuplicateError({
-  //     message: "This name is already in use",
-  //     action: "Try send another name",
-  //   });
-
-  // const cpfInUse = (await users.getUserByCPF(userData.cpf)) !== undefined;
-  // if (cpfInUse)
-  //   throw new DuplicateError({
-  //     message: "This CPF is already in use",
-  //     action: "Enter in your account with this CPF",
-  //   });
-
-  // const emailInUse = (await users.getUserByEmail(userData.email)) !== undefined;
-  // if (emailInUse)
-  //   throw new DuplicateError({
-  //     message: "This email is already in use",
-  //     action: "Enter with you email or send another email",
-  //   });
 }
 
 async function checkDuplicate(field, userData) {

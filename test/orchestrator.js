@@ -2,6 +2,7 @@ import retry from "async-retry";
 import database from "infra/database";
 import migrator from "infra/migrator";
 import redis from "infra/redis";
+import authorization from "models/authorization";
 import users from "models/users";
 import { parseSetCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -51,13 +52,23 @@ async function upMigrations() {
 }
 
 async function setMockUser(user) {
-  return await users.createUser(user);
+  const userResponse = await users.createUser(user);
+
+  userResponse.created_at = userResponse.created_at.toISOString();
+  userResponse.updated_at = userResponse.updated_at.toISOString();
+  userResponse.birth_day = userResponse.birth_day.toISOString();
+
+  return userResponse;
 }
 
 function parseCookiesFromResponse(response) {
   const setCookie = response.headers.get("set-cookie");
 
   return parseSetCookie(setCookie);
+}
+
+async function createConfirmToken(userId) {
+  return await authorization.saveValueWithToken("confirmation", userId);
 }
 
 const orchestrator = {
@@ -68,6 +79,7 @@ const orchestrator = {
   upMigrations,
   setMockUser,
   parseCookiesFromResponse,
+  createConfirmToken,
 };
 
 export default orchestrator;

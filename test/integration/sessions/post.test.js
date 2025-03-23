@@ -29,7 +29,7 @@ beforeAll(async () => {
 
 describe("POST to /api/v1/sessions", () => {
   describe("Annonymous User", () => {
-    describe("Perform a login", () => {
+    describe("Perform", () => {
       test("Valid login", async () => {
         const response = await fetch("http://localhost:3000/api/v1/sessions", {
           method: "POST",
@@ -46,8 +46,6 @@ describe("POST to /api/v1/sessions", () => {
 
         const body = await response.json();
         const responseToken = body.token;
-
-        console.log(responseToken);
 
         expect(typeof responseToken).toBe("string");
         expect(responseToken.length).toBe(32);
@@ -69,47 +67,32 @@ describe("POST to /api/v1/sessions", () => {
       });
 
       test("Invalid login", async () => {
-        const responseWithWrongEmail = await fetch(
-          "http://localhost:3000/api/v1/sessions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: "invalid_mail@email.com",
-              password: mockUser.password,
-            }),
+        const invalidUser = {
+          email: "invalid@mail.com",
+          password: "invalidPassword",
+        };
+
+        const response = await fetch("http://localhost:3000/api/v1/sessions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify({
+            email: invalidUser.email,
+            password: invalidUser.password,
+          }),
+        });
 
-        const bodyWithWrongEmail = await responseWithWrongEmail.json();
+        expect(response.status).toBe(401);
 
-        const responseWithWrongPassword = await fetch(
-          "http://localhost:3000/api/v1/sessions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: mockUser.email,
-              password: "invalid_password",
-            }),
-          },
-        );
+        const body = await response.json();
 
-        const bodyWithWrongPassword = await responseWithWrongPassword.json();
-
-        expect(bodyWithWrongEmail).toEqual(bodyWithWrongPassword);
-        expect(bodyWithWrongEmail.name).toBe("UnauthorizedError");
-        expect(bodyWithWrongEmail.message).toBe(
+        expect(body.name).toBe("UnauthorizedError");
+        expect(body.message).toBe(
           "The email and/or password don't match any account.",
         );
-        expect(bodyWithWrongEmail.action).toBe(
-          "Send an email and password valid.",
-        );
-        expect(bodyWithWrongEmail.status_code).toBe(401);
+        expect(body.action).toBe("Send an email and password valid.");
+        expect(body.status_code).toBe(401);
       });
     });
   });

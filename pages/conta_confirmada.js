@@ -1,9 +1,32 @@
+"use client";
+
 import Image from "next/image";
 import Box from "./interface/components/Box";
 import symbol from "public/principal-symbol.svg";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 function ContaConfirmada() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
+  useEffect(() => {
+    if (!token) return;
+
+    (async () => {
+      const response = await fetch("/api/v1/user/confirm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+        }),
+      });
+    })();
+  }, [token]);
+
   return (
     <Box
       box={true}
@@ -52,10 +75,10 @@ function ContaConfirmada() {
           Sua conta foi confirmada com sucesso!
         </p>
         <p className="md:text-sm">
-          <Link href="/" className="text-pool-dark">
+          <Link href="/login" className="text-pool-dark">
             Clique aqui
           </Link>{" "}
-          para ir à página principal.
+          para ir à página de login.
         </p>
       </Box>
     </Box>

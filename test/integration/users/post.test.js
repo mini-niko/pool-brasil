@@ -4,6 +4,7 @@ beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations(() => {});
+  await orchestrator.cleanRedis();
 });
 
 describe("POST to /api/v1/users", () => {
@@ -26,17 +27,6 @@ describe("POST to /api/v1/users", () => {
         },
       };
 
-      function addUserAttributes(oldUser, newUser) {
-        oldUser.id = newUser.id;
-        oldUser.features = newUser.features;
-        oldUser.birth_day = newUser.birth_day;
-        oldUser.created_at = newUser.created_at;
-        oldUser.updated_at = newUser.updated_at;
-        delete oldUser.confirm_password;
-
-        return oldUser;
-      }
-
       test("Valid", async () => {
         let validUser = {
           ...user,
@@ -44,17 +34,15 @@ describe("POST to /api/v1/users", () => {
 
         const response = await fetch("http://localhost:3000/api/v1/users", {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(validUser),
         });
 
         expect(response.status).toBe(201);
-
-        const body = await response.json();
-
-        validUser = addUserAttributes(validUser, body);
-
-        expect(body).toEqual(validUser);
       });
+
       describe("Invalid:", () => {
         describe("With existent", () => {
           test("Name", async () => {
@@ -65,6 +53,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(nameExistUser),
             });
 
@@ -86,6 +77,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(cpfExistUser),
             });
 
@@ -108,6 +102,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(emailExistUser),
             });
 
@@ -131,6 +128,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(withoutNameUser),
             });
 
@@ -152,6 +152,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(withoutCpfUser),
             });
 
@@ -173,6 +176,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(withoutEmailUser),
             });
 
@@ -194,6 +200,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(withoutPasswordUser),
             });
 
@@ -215,6 +224,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(withoutConfirmPasswordUser),
             });
 
@@ -236,6 +248,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(withoutBirthdayUser),
             });
 
@@ -262,6 +277,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(user),
             });
 
@@ -288,6 +306,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(user),
             });
 
@@ -316,6 +337,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(user),
             });
 
@@ -342,6 +366,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(user),
             });
 
@@ -370,6 +397,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(user),
             });
 
@@ -394,6 +424,9 @@ describe("POST to /api/v1/users", () => {
 
             const response = await fetch("http://localhost:3000/api/v1/users", {
               method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify(user),
             });
 

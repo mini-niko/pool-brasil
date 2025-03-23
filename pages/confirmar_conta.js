@@ -51,10 +51,6 @@ function ConfirmarConta() {
           Enviamos um email para sua conta para finalizar o registro da sua nova
           conta. Pode demorar alguns minutos.
         </p>
-        <p className="md:text-sm">
-          Não recebeu o email? <a className="text-pool-dark">Clique aqui</a>{" "}
-          para enviar outro email.
-        </p>
       </Box>
     </Box>
   );

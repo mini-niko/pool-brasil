@@ -1,4 +1,3 @@
-import redis from "infra/redis";
 import authorization from "./authorization";
 import { serialize } from "cookie";
 
@@ -15,15 +14,13 @@ function setSessionCookieInResponse(res, token) {
 }
 
 async function setSessionInRedis(user) {
-  const token = authorization.generateToken();
-
   const sessionUser = JSON.stringify({
     id: user.id,
     name: user.name,
     features: user.features,
   });
 
-  await redis.set(`session:${token}`, sessionUser, process.env.SESSION_TIME);
+  const token = await authorization.saveValueWithToken("session", sessionUser);
 
   return token;
 }
@@ -37,7 +34,7 @@ async function createSession(user, res) {
 }
 
 async function getUserFromSession(sessionToken) {
-  const query = await redis.search(`session:${sessionToken}`);
+  const query = await authorization.getValueWithToken("session", sessionToken);
 
   if (!query) return null;
 

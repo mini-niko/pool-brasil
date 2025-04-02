@@ -7,20 +7,25 @@ import {
 } from "react";
 
 export const UserContext = createContext();
+
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchUser = useCallback(async () => {
+    setIsLoading(true);
     const request = await fetch("/api/v1/sessions");
 
     const user = await request.json();
 
     setUser(user);
+    setIsLoading(false);
   }, []);
 
   const userContextValue = {
     user,
     fetchUser,
+    isLoading,
   };
 
   useEffect(() => {

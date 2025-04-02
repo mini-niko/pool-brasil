@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Box from "./interface/components/Box";
+import Box from "../interface/components/Box";
 import symbol from "public/principal-symbol.svg";
 import Link from "next/link";
 import { useEffect } from "react";

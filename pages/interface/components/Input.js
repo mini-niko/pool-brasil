@@ -12,7 +12,10 @@ function Input({
 }) {
   return (
     <Box id={`${name}-field-box`} flex={true} direction="col" gap={1}>
-      <label for={name} className="font-bold text-pool-dark text-xl md:text-lg">
+      <label
+        htmlFor={name}
+        className="font-bold text-pool-dark text-xl md:text-lg"
+      >
         {label}
       </label>
       <input

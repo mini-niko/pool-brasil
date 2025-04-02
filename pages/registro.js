@@ -12,7 +12,7 @@ import Select from "./interface/components/Select";
 function Registro() {
   const router = useRouter();
 
-  const [pageIndex, setPageIndex] = useState(3);
+  const [pageIndex, setPageIndex] = useState(0);
 
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
@@ -73,6 +73,35 @@ function Registro() {
     fetchCities();
   }, [state]);
 
+  async function onSubmit() {
+    const user = {
+      name,
+      cpf,
+      email,
+      password,
+      confirm_password: confirmPassword,
+      birth_day: birthDay,
+      address: {
+        state,
+        city,
+        street,
+        number,
+        complement,
+        reference,
+      },
+    };
+
+    const response = await fetch("/api/v1/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+
+    if (response.status == 201) router.push("/confirmar_conta");
+  }
+
   const pages = [
     <>
       <Box
@@ -105,8 +134,7 @@ function Registro() {
         title={
           <TitleSubtitle
             title="Dados Pessoais"
-            subtitle="
-            Preencha os campos abaixo com os seus dados para iniciar o cadastro."
+            subtitle="Preencha os campos abaixo com os seus dados para iniciar o cadastro."
           />
         }
         buttonLabel={"Próximo"}
@@ -268,7 +296,7 @@ function Registro() {
         }
         onSubmit={(e) => e.preventDefault()}
         onBack={() => setPageIndex(2)}
-        onClick={() => router.push("/confirmar_conta")}
+        onClick={onSubmit}
       ></Form>
     </>,
   ];

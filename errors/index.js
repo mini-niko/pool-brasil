@@ -42,3 +42,15 @@ export class UnauthorizedError extends Error {
     this.stack = stack;
   }
 }
+
+export class NotFoundError extends Error {
+  constructor({ message, action, statusCode, stack }) {
+    super();
+    this.name = "NotFoundError";
+    this.message = message || "The resource you request was not found.";
+    this.action =
+      action || "Send an valid indentifier or create a new resource.";
+    this.statusCode = statusCode || 404;
+    this.stack = stack;
+  }
+}

@@ -1,6 +1,8 @@
 import database from "infra/database";
 import userValidation from "./validation/user";
 import { cpf } from "cpf-cnpj-validator";
+import authorization from "./authorization";
+import { NotFoundError } from "errors";
 
 async function createUser(userData = {}) {
   userData.cpf = cpf.format(userData.cpf).replaceAll(".", "").replace("-", "");
@@ -61,6 +63,40 @@ async function getUserByLogin(email, password) {
   return formatUser(response.rows[0]);
 }
 
+async function updateUser(searchKey, searchValue, updateKey, updateValue) {
+  if (searchKey === "id") userValidation.validID(searchValue);
+
+  const response = await database.query(
+    `UPDATE users
+     SET ${updateKey} = $1
+     WHERE ${searchKey} = $2
+     RETURNING *;`,
+    [updateValue, searchValue],
+  );
+
+  return formatUser(response.rows[0]);
+}
+
+async function confirmAccount(token) {
+  const userId = await authorization.getValueWithToken("confirmation", token);
+
+  if (!userId)
+    throw new NotFoundError({
+      message: "There is no pending confirmation with this token.",
+      action: "Send an valid confirm token or request a new confirmation.",
+    });
+
+  const user = await updateUser("id", userId, "features", ["client"]);
+
+  if (!user)
+    throw new NotFoundError({
+      message: "The confirmation's account does not exists or is invalid.",
+      action: "Send an valid confirm token or request a new confirmation.",
+    });
+
+  return userId;
+}
+
 function formatUser(data) {
   if (!data) return;
 
@@ -89,6 +125,7 @@ const users = {
   getUserByLogin,
   createUser,
   getUser,
+  confirmAccount,
 };
 
 export default users;

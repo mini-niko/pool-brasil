@@ -22,10 +22,6 @@ beforeAll(async () => {
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
   mockUser = await orchestrator.setMockUser(mockUser);
-
-  mockUser.created_at = mockUser.created_at.toISOString();
-  mockUser.updated_at = mockUser.updated_at.toISOString();
-  mockUser.birth_day = mockUser.birth_day.toISOString();
 });
 
 describe("GET to /api/v1/users", () => {
@@ -65,7 +61,7 @@ describe("GET to /api/v1/users", () => {
         expect(body).toEqual({
           name: "ValidationError",
           message: '"id" must be and uuid id.',
-          action: "Try send an valid id",
+          action: "Try send an valid id.",
           status_code: 400,
         });
       });

@@ -1,8 +1,6 @@
 import Box from "./Box";
 
 function Submit({ onClick, label }) {
-  console.log(onClick);
-
   return (
     <Box box={true} flex={true} color={"dark"} className="rounded-md">
       <button

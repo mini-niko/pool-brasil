@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import Box from "./interface/components/Box";
+import Box from "../interface/components/Box";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import Button from "./interface/components/Button";
-import TitleSubtitle from "./interface/components/TitleSubtitle";
-import DefaultContainer from "./interface/components/DefaultContainer";
-import Form from "./interface/components/Form";
-import Input from "./interface/components/Input";
-import Select from "./interface/components/Select";
+import Button from "../interface/components/Button";
+import TitleSubtitle from "../interface/components/TitleSubtitle";
+import DefaultContainer from "../interface/components/DefaultContainer";
+import Form from "../interface/components/Form";
+import Input from "../interface/components/Input";
+import Select from "../interface/components/Select";
 
 function Registro() {
   const router = useRouter();

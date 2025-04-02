@@ -1,7 +1,7 @@
 import localFont from "next/font/local";
 import Head from "next/head";
 import "styles/global.css";
-import { UserProvider } from "pages/interface/hooks/useUser.js";
+import { UserProvider } from "interface/hooks/useUser.js";
 
 const viceCityFont = localFont({
   src: [

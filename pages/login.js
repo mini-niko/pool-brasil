@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import DefaultContainer from "./interface/components/DefaultContainer";
-import Input from "./interface/components/Input";
-import Form from "./interface/components/Form";
-import TitleSubtitle from "./interface/components/TitleSubtitle";
-import useUser from "./interface/hooks/useUser";
+import DefaultContainer from "interface/components/DefaultContainer";
+import Input from "interface/components/Input";
+import Form from "interface/components/Form";
+import TitleSubtitle from "interface/components/TitleSubtitle";
+import useUser from "interface/hooks/useUser";
 
 function Login() {
   return (

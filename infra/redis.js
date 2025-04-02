@@ -32,6 +32,7 @@ async function search(key) {
 async function flush() {
   const client = await getClient();
   await client.flushAll();
+  
   await client.quit();
 }
 

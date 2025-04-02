@@ -1,7 +1,7 @@
 import redis from "infra/redis";
 
 function generateToken() {
-  const array = new Uint8Array(16);
+  const array = new Uint8Array(16); // eslint-disable-line no-undef
   crypto.getRandomValues(array);
   return Array.from(array, (byte) => byte.toString(16).padStart(2, 0)).join("");
 }

@@ -1,7 +1,6 @@
 import database from "infra/database";
 import userValidation from "./validation/user";
 import { cpf } from "cpf-cnpj-validator";
-import redis from "infra/redis";
 import authorization from "./authorization";
 import { NotFoundError } from "errors";
 

@@ -15,7 +15,7 @@ function ContaConfirmada() {
     if (!token) return;
 
     (async () => {
-      const response = await fetch("/api/v1/user/confirm", {
+      await fetch("/api/v1/user/confirm", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

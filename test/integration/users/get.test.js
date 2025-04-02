@@ -36,8 +36,6 @@ describe("GET to /api/v1/users", () => {
 
         const body = await response.json();
 
-        console.log(body);
-
         expect(body).toEqual(mockUser);
       });
       test("With non-existent ID", async () => {

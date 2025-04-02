@@ -10,8 +10,6 @@ export default createRouter().post(postHandler).handler({
 async function postHandler(req, res) {
   const token = req.body.token;
 
-  console.log(token);
-
   if (!token)
     throw new ValidationError({
       message: "'token' cannot be null.",

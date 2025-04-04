@@ -1,13 +1,28 @@
 import { useEffect, useState } from "react";
-import Box from "../interface/components/Box";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import Button from "../interface/components/Button";
-import TitleSubtitle from "../interface/components/TitleSubtitle";
-import DefaultContainer from "../interface/components/DefaultContainer";
-import Form from "../interface/components/Form";
-import Input from "../interface/components/Input";
-import Select from "../interface/components/Select";
+import DefaultContainer from "@/components/ui/defaultContainer";
+import Form from "@/components/ui/Form";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectLabel,
+} from "@/components/ui/select";
+import {} from "@radix-ui/react-select";
 
 function Registro() {
   const router = useRouter();
@@ -17,7 +32,7 @@ function Registro() {
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
   const [email, setEmail] = useState("");
-  const [birthDay, setBirthDay] = useState();
+  const [birthDay, setBirthDay] = useState("");
 
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState();
@@ -74,13 +89,15 @@ function Registro() {
   }, [state]);
 
   async function onSubmit() {
+    const isoBirthDay = new Date(birthDay || 0).toISOString();
+
     const user = {
       name,
       cpf,
       email,
       password,
       confirm_password: confirmPassword,
-      birth_day: birthDay,
+      birth_day: isoBirthDay,
       address: {
         state,
         city,
@@ -90,6 +107,8 @@ function Registro() {
         reference,
       },
     };
+
+    console.log(user);
 
     const response = await fetch("/api/v1/users", {
       method: "POST",
@@ -104,196 +123,211 @@ function Registro() {
 
   const pages = [
     <>
-      <Box
-        box={true}
-        flex={true}
-        direction="col"
-        items="center"
-        justify="center"
-        gap={4}
-        color={"white"}
-        className="w-fit px-8 py-24 md:px-12 gap-4 z-20 flex-1 items-center"
-      >
-        <TitleSubtitle
-          title={"Registro"}
-          subtitle={"Vamos iniciar seu registro?"}
-        />
-        <Button color={"dark"} onClick={() => setPageIndex(1)}>
-          Iniciar
-        </Button>
-        <p className="md:text-sm">
-          <span className="text-pool-dark">Já possui uma conta? </span>
-          <Link className="underline" href="/login">
-            Entrar agora
-          </Link>
-        </p>
-      </Box>
+      <Card className="items-center z-20 relative">
+        <CardHeader className="w-[350px]">
+          <CardTitle>
+            <h1>Registro</h1>
+          </CardTitle>
+          <CardDescription>
+            <h2>Vamos iniciar seu registro?</h2>
+          </CardDescription>
+        </CardHeader>
+        <CardFooter className="flex-col gap-4">
+          <Button onClick={() => setPageIndex(1)}>Iniciar</Button>
+          <p className="text-sm">
+            <span>Já possui uma conta? </span>
+            <Link className="underline text-pool-black" href="/login">
+              Entrar agora
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </>,
     <>
       <Form
-        title={
-          <TitleSubtitle
-            title="Dados Pessoais"
-            subtitle="Preencha os campos abaixo com os seus dados para iniciar o cadastro."
-          />
-        }
+        title="Dados Pessoais"
+        subtitle="Preencha os campos abaixo com os seus dados para iniciar o cadastro."
         buttonLabel={"Próximo"}
-        fields={
+        fields={[
           <>
+            <Label htmlFor="name">Nome</Label>
             <Input
-              label="Nome"
-              name="name"
+              id="name"
               type="text"
               value={name}
-              setValue={setName}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Fulano da Silva"
             />
+          </>,
+          <>
+            <Label htmlFor="cpf">CPF</Label>
             <Input
-              label="CPF"
-              name="cpf"
+              id="cpf"
               type="text"
               value={cpf}
-              setValue={setCpf}
+              onChange={(e) => setCpf(e.target.value)}
               placeholder="012.345.678-90"
             />
+          </>,
+          <>
+            <Label htmlFor="email">Email</Label>
             <Input
-              label="Email"
-              name="email"
+              id="email"
               value={email}
-              setValue={setEmail}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="exemplo@email.com"
             />
+          </>,
+          <>
+            <Label htmlFor="birthday">Data de Nascimento</Label>
             <Input
-              label="Data de Nascimento"
+              className="w-fit"
+              id="birthday"
               type="date"
-              name="birthday"
-              value={birthDay}
-              setValue={setBirthDay}
-              placeholder="exemplo@email.com"
+              onChange={(e) => setBirthDay(e.target.value)}
             />
-          </>
-        }
-        onSubmit={(e) => e.preventDefault()}
+          </>,
+        ]}
         onBack={() => setPageIndex(0)}
         onClick={() => setPageIndex(2)}
-      >
-        <p className="md:text-sm">
-          <span className="text-pool-dark">Já possui uma conta? </span>
-          <Link className="underline" href="/login">
-            Entrar agora
-          </Link>
-        </p>
-      </Form>
+        footer={
+          <p className="text-sm">
+            <span>Já possui uma conta? </span>
+            <Link className="underline text-pool-black" href="/login">
+              Entrar agora
+            </Link>
+          </p>
+        }
+      />
     </>,
     <>
       <Form
-        title={
-          <TitleSubtitle
-            title="Endereço"
-            subtitle="
-            Adicione o seu endereço para futuros serviços (endereço do local da
-            piscina)"
-          />
-        }
+        title="Endereço"
+        subtitle="Adicione o seu endereço para futuros serviços (endereço do local da
+          piscina)"
         buttonLabel={"Próximo"}
-        fields={
+        fields={[
           <>
+            <Label htmlFor="street">Rua</Label>
             <Input
-              label="Rua"
-              name="street"
+              id="street"
               type="text"
               value={street}
-              setValue={setStreet}
+              onChange={(e) => setStreet(e.target.value)}
               placeholder="Rua XYZ"
             />
+          </>,
+          <>
+            <Label htmlFor="number">Número</Label>
             <Input
-              label="Número"
-              name="street"
+              id="number"
               type="text"
               value={number}
-              setValue={setNumber}
+              onChange={(e) => setNumber(e.target.value)}
               placeholder="0"
-              className="w-2/5"
             />
+          </>,
+          <>
+            <Label htmlFor="complement">Complemento (opcional)</Label>
             <Input
-              label="Complemento (opcional)"
-              name="complement"
+              id="complement"
               type="text"
               value={complement}
-              setValue={setComplement}
+              onChange={(e) => setComplement(e.target.value)}
               placeholder="Apartamento 0"
             />
-            <Select
-              label="Estado"
-              name="state"
-              value={state}
-              setValue={setState}
-              placeholder="-- Selecione um estado --"
-            >
-              {states.map((sail) => {
-                return (
-                  <option key={sail} value={sail}>
-                    {sail}
-                  </option>
-                );
-              })}
+          </>,
+          <>
+            <Label htmlFor="state">Estado</Label>
+            <Select id="state" value={state} onValueChange={setState}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione um estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Estados</SelectLabel>
+                  {states.map((sail) => {
+                    return (
+                      <SelectItem key={sail} value={sail}>
+                        {sail}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
             </Select>
-            <Select
-              label="Cidade"
-              name="city"
-              value={city}
-              setValue={setCity}
-              placeholder="-- Selecione uma cidade --"
-            >
-              {cities.map((name) => {
-                return (
-                  <option key={name} value={name}>
-                    {name}
-                  </option>
-                );
-              })}
+          </>,
+          <>
+            <Label htmlFor="state">Cidade</Label>
+            <Select id="city" value={city} onValueChange={setCity}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione uma cidade" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Cidade</SelectLabel>
+                  {cities.map((name) => {
+                    return (
+                      <SelectItem key={name} value={name}>
+                        {name}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
             </Select>
+          </>,
+          <>
+            <Label htmlFor="reference">Referência</Label>
             <Input
-              label="Referência"
-              name="reference"
+              id="reference"
               type="text"
               value={reference}
-              setValue={setReference}
+              onChange={(e) => setReference(e.target.value)}
               placeholder=""
             />
-          </>
-        }
-        onSubmit={(e) => e.preventDefault()}
+          </>,
+        ]}
         onBack={() => setPageIndex(1)}
         onClick={() => setPageIndex(3)}
-      ></Form>
+        footer={
+          <p className="text-sm">
+            <span>Já possui uma conta? </span>
+            <Link className="underline text-pool-black" href="/login">
+              Entrar agora
+            </Link>
+          </p>
+        }
+      />
     </>,
     <>
       <Form
-        title={
-          <TitleSubtitle
-            title="Senha"
-            subtitle="
-            Crie a sua nova senha."
-          />
-        }
-        buttonLabel={"Próximo"}
-        fields={
+        title="Senha"
+        subtitle="
+          Crie a sua nova senha."
+        buttonLabel="Próximo"
+        fields={[
           <>
+            <Label htmlFor="password">Senha</Label>
             <Input
-              label="Senha"
-              name="password"
+              id="password"
+              type="password"
               value={password}
-              setValue={setPassword}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Digite sua senha"
             />
+          </>,
+          <>
+            <Label htmlFor="confirmPassword">Repita a senha</Label>
             <Input
-              label="Repita a senha"
-              name="password"
+              id="confirmPassword"
+              type="password"
               value={confirmPassword}
-              setValue={setConfirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Repita sua senha"
             />
-          </>
-        }
+          </>,
+        ]}
         onSubmit={(e) => e.preventDefault()}
         onBack={() => setPageIndex(2)}
         onClick={onSubmit}

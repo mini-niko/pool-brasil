@@ -1,24 +1,10 @@
-import Box from "./Box";
 import Image from "next/image";
 import symbol from "public/principal-symbol.svg";
 
 function DefaultContainer({ children }) {
   return (
-    <Box
-      box={true}
-      flex={true}
-      direction="col"
-      items="center"
-      justify="center"
-      color="light"
-      className="p-8 min-h-screen w-screen rounded-none relative"
-    >
-      <Box
-        flex={true}
-        items="center"
-        justify="center"
-        className="z-10 hidden md:flex absolute"
-      >
+    <div className="flex items-center justify-center min-h-screen p-8 w-screen rounded-none relative bg-pool-light">
+      <div className="flex items-center justify-center z-10 hidden md:flex absolute">
         <Image
           height={symbol.height}
           width={symbol.width}
@@ -33,9 +19,9 @@ function DefaultContainer({ children }) {
           src={symbol.src}
           alt=""
         />
-      </Box>
+      </div>
       {children}
-    </Box>
+    </div>
   );
 }
 

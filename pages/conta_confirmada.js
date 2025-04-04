@@ -1,87 +1,129 @@
 "use client";
 
-import Image from "next/image";
-import Box from "../interface/components/Box";
-import symbol from "public/principal-symbol.svg";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import DefaultContainer from "@/components/ui/defaultContainer";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import Confetti from "react-confetti";
 
 function ContaConfirmada() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  useEffect(() => {
-    if (!token) return;
+  const [isLoading, setIsLoading] = useState(true);
+  const [isOk, setIsOk] = useState(false);
 
-    (async () => {
-      await fetch("/api/v1/user/confirm", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token,
-        }),
-      });
-    })();
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    setSize({ width: window.innerWidth, height: window.innerHeight });
+
+    const confirm = async () => {
+      try {
+        const response = await fetch("/api/v1/user/confirm", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token,
+          }),
+        });
+
+        const status = response.status;
+
+        if (status !== 200) {
+          setIsOk(false);
+        }
+      } catch (err) {
+        setIsOk(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    confirm();
   }, [token]);
 
   return (
-    <Box
-      box={true}
-      flex={true}
-      direction="col"
-      items="center"
-      justify="center"
-      color="light"
-      className="p-8 min-h-screen w-screen rounded-none relative"
-    >
-      <Box
-        flex={true}
-        items="center"
-        justify="center"
-        className="z-10 hidden md:flex absolute"
-      >
-        <Image
-          height={symbol.height}
-          width={symbol.width}
-          className="w-max md:w-72"
-          src={symbol.src}
-          alt=""
-        />
-        <Image
-          height={symbol.height}
-          width={symbol.width}
-          className="w-max md:w-72"
-          src={symbol.src}
-          alt=""
-        />
-      </Box>
-      <Box
-        box={true}
-        flex={true}
-        direction="col"
-        items="center"
-        justify="center"
-        gap={4}
-        color={"white"}
-        className="w-fit px-8 py-24 md:px-12 gap-4 z-20 flex-1 justify-center text-center w-min"
-      >
-        <h1 className="font-bold text-3xl md:text-2xl whitespace-nowrap">
-          Conta confirmada
-        </h1>
-        <p className="text-xl md:text-lg md:leading-none">
-          Sua conta foi confirmada com sucesso!
+    <>
+      {!isLoading && !isOk && (
+        <div className="absolute inset-0 z-30 pointer-events-none">
+          <Confetti
+            width={size.width}
+            height={size.height}
+            recycle={false}
+            numberOfPieces={1000}
+            tweenDuration={3000}
+            gravity={0.3}
+          />
+        </div>
+      )}
+      <DefaultContainer>
+        <Card className="items-center py-48 z-20 relative">
+          {!isLoading && !isOk && (
+            <>
+              <OkComponent />
+            </>
+          )}
+          {!isLoading && isOk && <ErrorComponent />}
+        </Card>
+      </DefaultContainer>
+    </>
+  );
+}
+
+function OkComponent() {
+  return (
+    <>
+      <CardHeader className="w-[350px]">
+        <CardTitle>
+          <h1>Conta confirmada</h1>
+        </CardTitle>
+        <CardDescription>
+          <p>Sua conta foi confirmada com sucesso!</p>
+        </CardDescription>
+      </CardHeader>
+      <CardFooter className="flex justify-center">
+        <Link
+          className="underline text-sm text-center hover:cursor-pointer"
+          href="/login"
+        >
+          Ir para a página de login
+        </Link>
+      </CardFooter>
+    </>
+  );
+}
+
+function ErrorComponent() {
+  return (
+    <CardHeader className="w-[350px]">
+      <CardTitle>
+        <h1>Algo de errado aconteceu...</h1>
+      </CardTitle>
+      <CardDescription>
+        <p>
+          Você acessou a página com um token inválido. Pode acontecer caso o
+          link de acesso expirou ou não possui o token.
+          <br />
+          Tente realizar o cadastro novamente.
         </p>
-        <p className="md:text-sm">
-          <Link href="/login" className="text-pool-dark">
-            Clique aqui
-          </Link>{" "}
-          para ir à página de login.
-        </p>
-      </Box>
-    </Box>
+      </CardDescription>
+      <CardFooter className="flex justify-center">
+        <Link className="underline text-sm" href="/registro">
+          Ir para a página de cadastro
+        </Link>
+      </CardFooter>
+    </CardHeader>
   );
 }
 

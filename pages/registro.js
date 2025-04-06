@@ -258,7 +258,7 @@ function Registro() {
             </Select>
           </>,
           <>
-            <Label htmlFor="state">Cidade</Label>
+            <Label htmlFor="city">Cidade</Label>
             <Select id="city" value={city} onValueChange={setCity}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Selecione uma cidade" />

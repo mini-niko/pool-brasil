@@ -50,7 +50,9 @@ async function middleware(req) {
 
 async function getUser(token, baseUrl) {
   if (!token) return null;
-  const res = await fetch(new URL(`/api/v1/sessions?token=${token}`, baseUrl));
+  const res = await fetch(
+    new URL(`/api/v1/sessions?token=${token}`, process.env.SERVER_URL),
+  );
 
   return res.status === 200 && (await res.json());
 }

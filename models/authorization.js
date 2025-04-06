@@ -25,7 +25,7 @@ async function getValueWithToken(prefix, token) {
 async function sendEmailToConfirmAccount(emailAdress, token) {
   const body = <EmailComponent token={token} />;
 
-  email.sendMail(emailAdress, body);
+  email.sendMail(emailAdress, "Confirmação da conta", body);
 }
 
 const authorization = {

@@ -14,14 +14,14 @@ const transporter = nodemailer.createTransport({
   secure: isSecure(),
 });
 
-async function sendMail(toEmail, component = <EmailComponent />) {
+async function sendMail(toEmail, subject, component = <EmailComponent />) {
   const html = await render(component);
 
   const mail = await transporter.sendMail({
     from: mailCredentials.user,
     to: toEmail,
     replyTo: mailCredentials.user,
-    subject: "??????",
+    subject,
     html,
   });
 

@@ -48,10 +48,6 @@ async function flush() {
   await client.quit();
 }
 
-async function isSecure() {
-  return true;
-}
-
 const redis = {
   search,
   set,

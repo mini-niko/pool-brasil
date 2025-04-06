@@ -3,13 +3,7 @@ import useUser from "interface/hooks/useUser";
 import NavigationBar from "interface/components/NavigationBar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Calendar,
-  CalendarDays,
-  ClockFading,
-  Loader2,
-  Rotate3D,
-} from "lucide-react";
+import { Calendar, ClockFading, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 function Index() {

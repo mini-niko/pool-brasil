@@ -1,5 +1,4 @@
 import logo from "public/nome_branco.png";
-import configIcon from "public/icons/config.svg";
 import Image from "next/image";
 import { Settings } from "lucide-react";
 

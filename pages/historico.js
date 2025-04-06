@@ -104,7 +104,7 @@ function CustomTable() {
       <TableBody>
         {appointments.map((appointment, index) => {
           return (
-            <TableRow className="justify-center">
+            <TableRow key={index} className="justify-center">
               <TableCell>{appointment.professional}</TableCell>
               <TableCell className="hidden">{appointment.service}</TableCell>
               <TableCell>{appointment.date_time}</TableCell>

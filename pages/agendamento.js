@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import NavigationBar from "@/interface/components/NavigationBar";
-import { ArrowLeft, ArrowLeftCircle, PartyPopper } from "lucide-react";
+import { ArrowLeft, PartyPopper } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";

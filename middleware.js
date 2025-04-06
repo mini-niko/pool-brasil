@@ -23,7 +23,7 @@ async function middleware(req) {
   const reqPath = req.nextUrl.pathname;
   const token = req.cookies.get("sessionToken")?.value;
 
-  const user = await getUser(token, req.nextUrl.pathname);
+  const user = await getUser(token, req.nextUrl.origin);
 
   const [isPrivate, isPublic] = getPathType(reqPath);
 

@@ -73,7 +73,7 @@ function EmailComponent({ token = "" }) {
         <Container className="container">
           <div className="header">
             <Img
-              src="http://localhost:3000/nome_branco.png"
+              src={`${process.env.SERVER_URL}/nome_branco.png`}
               alt="Logo"
               className="logo"
             />
@@ -87,7 +87,7 @@ function EmailComponent({ token = "" }) {
             </p>
 
             <a
-              href={`http://localhost:3000/conta_confirmada?token=${token}`}
+              href={`${process.env.SERVER_URL}/conta_confirmada?token=${token}`}
               className="button"
             >
               Ativar Conta

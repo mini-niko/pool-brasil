@@ -23,7 +23,7 @@ async function middleware(req) {
   const reqPath = req.nextUrl.pathname;
   const token = req.cookies.get("sessionToken")?.value;
 
-  const user = await getUser(token, req.nextUrl.origin);
+  const user = await getUser(token);
 
   const [isPrivate, isPublic] = getPathType(reqPath);
 
@@ -48,9 +48,11 @@ async function middleware(req) {
   return res;
 }
 
-async function getUser(token, baseUrl) {
+async function getUser(token) {
   if (!token) return null;
-  const res = await fetch(new URL(`/api/v1/sessions?token=${token}`, baseUrl));
+  const res = await fetch(
+    new URL(`/api/v1/sessions?token=${token}`, process.env.SERVER_URL),
+  );
 
   return res.status === 200 && (await res.json());
 }

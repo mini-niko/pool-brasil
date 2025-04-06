@@ -1,58 +1,35 @@
-import Image from "next/image";
-import Box from "../interface/components/Box";
-import symbol from "public/principal-symbol.svg";
+import DefaultContainer from "@/components/ui/defaultContainer";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
 
 function ConfirmarConta() {
   return (
-    <Box
-      box={true}
-      flex={true}
-      direction="col"
-      items="center"
-      justify="center"
-      color="light"
-      className="p-8 min-h-screen w-screen rounded-none relative"
-    >
-      <Box
-        flex={true}
-        items="center"
-        justify="center"
-        className="z-10 hidden md:flex absolute"
-      >
-        <Image
-          height={symbol.height}
-          width={symbol.width}
-          className="w-max md:w-72"
-          src={symbol.src}
-          alt=""
-        />
-        <Image
-          height={symbol.height}
-          width={symbol.width}
-          className="w-max md:w-72"
-          src={symbol.src}
-          alt=""
-        />
-      </Box>
-      <Box
-        box={true}
-        flex={true}
-        direction="col"
-        items="center"
-        justify="center"
-        gap={4}
-        color={"white"}
-        className="w-fit px-8 py-24 md:px-12 gap-4 z-20 flex-1 justify-center text-center w-min"
-      >
-        <h1 className="font-bold text-3xl md:text-2xl whitespace-nowrap">
-          Confirme sua conta
-        </h1>
-        <p className="text-xl md:text-lg md:leading-none">
-          Enviamos um email para sua conta para finalizar o registro da sua nova
-          conta. Pode demorar alguns minutos.
-        </p>
-      </Box>
-    </Box>
+    <DefaultContainer>
+      <Card className="items-center py-48 z-20 relative">
+        <CardHeader className="w-[350px]">
+          <CardTitle>
+            <h1>Confirme sua conta</h1>
+          </CardTitle>
+          <CardDescription>
+            <p>
+              Enviamos um email para sua conta para finalizar o registro da sua
+              nova conta. Pode demorar alguns minutos.
+            </p>
+          </CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Link className="underline text-sm" href="/login">
+            Ir para a página de login
+          </Link>
+        </CardFooter>
+      </Card>
+    </DefaultContainer>
   );
 }
 

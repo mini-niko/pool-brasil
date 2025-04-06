@@ -16,7 +16,7 @@ const publicRoutes = [
 
 export const config = {
   runtime: "nodejs",
-  matcher: ["/((?!_next/static|va/|favicon|manifest).*)"],
+  matcher: ["/((?!api|_next/static|va/|favicon|manifest).*)"],
 };
 
 async function middleware(req) {

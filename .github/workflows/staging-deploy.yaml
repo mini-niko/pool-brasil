@@ -3,7 +3,7 @@ name: Production Deployment
 on:
   push:
     branches:
-      - stage
+      - configure-deploy-actions
 
   workflow_dispatch:
 
@@ -14,6 +14,9 @@ jobs:
       name: stage
       url: ${{vars.URL}}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Build Docker image
         run: docker build -t pool-brasil .
 
@@ -24,7 +27,15 @@ jobs:
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
-          TARGET: "public/poolbrasil/stage"
-          SOURCE: pool-brasil.tar.gz
+          TARGET: "/public/poolbrasil/stage"
+          SOURCE: pool-brasil.tar
           REMOTE_HOST: ${{vars.REMOTE_HOST}}
           REMOTE_USER: ${{vars.REMOTE_USER}}
+
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.REMOTE_HOST }}
+          username: ${{ vars.REMOTE_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: "cd /public/poolbrasil/stage && docker load -i pool-brasil.tar && docker compose -f compose.yaml up -d"

@@ -3,7 +3,7 @@ name: Production Deployment
 on:
   push:
     branches:
-      - stage
+      - main
 
   workflow_dispatch:
 
@@ -11,7 +11,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: stage
+      name: prod
       url: ${{vars.URL}}
     steps:
       - name: Checkout
@@ -21,21 +21,21 @@ jobs:
         run: docker build -t pool-brasil .
 
       - name: Get Docker image tarball
-        run: docker save -o pool-brasil-stage.tar pool-brasil:latest
+        run: docker save -o pool-brasil-prod.tar pool-brasil:latest
 
       - name: Deployment
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
           TARGET: ${{secrets.OUTPUT_PATH}}
-          SOURCE: pool-brasil-stage.tar
+          SOURCE: pool-brasil-prod.tar
           REMOTE_HOST: ${{vars.REMOTE_HOST}}
           REMOTE_USER: ${{vars.REMOTE_USER}}
 
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ vars.REMOTE_HOST }}
-          username: ${{ vars.REMOTE_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: "cd ${{secrets.OUTPUT_PATH}} && docker load -i pool-brasil-stage.tar && docker compose -f compose.yaml up -d"
+          host: ${{vars.REMOTE_HOST}}
+          username: ${{vars.REMOTE_USER}}
+          key: ${{secrets.SERVER_SSH_KEY}}
+          script: cd ${{secrets.OUTPUT_PATH}} && docker load -i pool-brasil-prod.tar && docker compose -f compose.yaml up -d

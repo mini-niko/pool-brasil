@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "commit": "cz",
-    "lint:prettier:check": "prettier --check .",
+    "lint:prettier:check": "prettier --check . --log-level debug",
     "lint:prettier:fix": "prettier --write .",
     "lint:eslint:check": "next lint --dir .",
     "dev": "npm run services:up && node infra/scripts/wait-for-postgres.js && npm run migration:up && next dev --turbopack",

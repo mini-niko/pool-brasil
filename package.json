@@ -15,7 +15,9 @@
     "services:down": "npm run docker:compose -- down",
     "docker:compose": "docker compose --env-file .env.development -f infra/compose.yaml",
     "test": "npm run services:up && concurrently -n next,jest --hide next -k ---success command-jest 'next dev' 'jest --runInBand'",
-    "test:watch": "jest --watchAll --runInBand --verbose"
+    "test:watch": "jest --watchAll --runInBand --verbose",
+    "build": "next build",
+    "start": "next start"
   },
   "keywords": [],
   "author": "",

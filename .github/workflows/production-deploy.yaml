@@ -35,7 +35,7 @@ jobs:
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ vars.REMOTE_HOST }}
-          username: ${{ vars.REMOTE_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          host: ${{vars.REMOTE_HOST}}
+          username: ${{vars.REMOTE_USER}}
+          key: ${{secrets.SERVER_SSH_KEY}}
           script: cd ${{secrets.OUTPUT_PATH}} && docker load -i pool-brasil-prod.tar && docker compose -f compose.yaml up -d

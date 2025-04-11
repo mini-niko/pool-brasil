@@ -18,10 +18,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t pool-brasil .
+        run: docker build -t pool-brasil-stage .
 
       - name: Get Docker image tarball
-        run: docker save -o pool-brasil-stage.tar pool-brasil:latest
+        run: docker save -o pool-brasil-stage.tar pool-brasil-stage:latest
 
       - name: Deployment
         uses: easingthemes/ssh-deploy@main

@@ -21,7 +21,7 @@ jobs:
         run: docker build -t pool-brasil .
 
       - name: Get Docker image tarball
-        run: docker save -o pool-brasil-stage.tar pool-brasil:latest
+        run: docker save -o pool-brasil-stage.tar pool-brasil-stage:latest
 
       - name: Deployment
         uses: easingthemes/ssh-deploy@main

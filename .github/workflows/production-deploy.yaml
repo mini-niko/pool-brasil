@@ -37,5 +37,5 @@ jobs:
         with:
           host: ${{vars.REMOTE_HOST}}
           username: ${{vars.REMOTE_USER}}
-          key: ${{vars.SERVER_SSH_KEY}}
+          key: ${{secrets.SERVER_SSH_KEY}}
           script: cd ${{vars.OUTPUT_PATH}} && docker load -i pool-brasil-prod.tar && docker compose -f compose.yaml up -d

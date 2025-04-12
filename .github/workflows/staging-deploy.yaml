@@ -38,4 +38,9 @@ jobs:
           host: ${{vars.REMOTE_HOST}}
           username: ${{vars.REMOTE_USER}}
           key: ${{secrets.SERVER_SSH_KEY}}
-          script: "cd ${{vars.OUTPUT_PATH}} && docker load -i pool-brasil-stage.tar && docker compose -f compose.yaml up -d"
+          script: | 
+            cd ${{vars.OUTPUT_PATH}}
+            docker compose -f compose.yaml down
+            docker rmi pool-brasil-stage || true
+            docker load -i pool-brasil-stage.tar
+            docker compose -f compose.yaml up -d

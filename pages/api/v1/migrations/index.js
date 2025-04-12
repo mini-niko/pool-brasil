@@ -1,7 +1,10 @@
+import controller from "@/models/controllers";
 import migrator from "infra/migrator";
 import { createRouter } from "next-connect";
 
-export default createRouter().get(getHandler).post(postHandler).handler();
+export default createRouter().get(getHandler).post(postHandler).handler({
+  onError: controller.handlerError,
+});
 
 async function getHandler(req, res) {
   const pendingMigrations = await migrator.listPendingMigrations();

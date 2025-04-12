@@ -19,6 +19,7 @@ COPY --from=builder /app/.next ./.next/
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./package-lock.json
+COPY --from=builder /app/infra/migrations ./infra/migrations
 
 RUN npm ci --only=production
 

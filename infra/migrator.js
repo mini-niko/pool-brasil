@@ -1,4 +1,3 @@
-import { InternalServerError } from "errors";
 import database from "infra/database.js";
 import migrationRunner from "node-pg-migrate";
 import { resolve } from "node:path";
@@ -18,12 +17,9 @@ async function listPendingMigrations() {
       ...runnerOptions,
       dbClient,
       dryRun: true,
-      log: () => {},
     });
 
     return migrate;
-  } catch {
-    throw new InternalServerError({ stack: new Error().stack });
   } finally {
     await dbClient.end();
   }
@@ -36,12 +32,9 @@ async function runPendingMigrations() {
     const migrate = await migrationRunner({
       ...runnerOptions,
       dbClient,
-      log: () => {},
     });
 
     return migrate;
-  } catch {
-    throw new InternalServerError({ stack: new Error().stack });
   } finally {
     await dbClient.end();
   }

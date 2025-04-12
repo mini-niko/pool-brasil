@@ -3,7 +3,7 @@ import migrationRunner from "node-pg-migrate";
 import { resolve } from "node:path";
 
 const runnerOptions = {
-  dir: resolve("infra", "migrations"),
+  dir: resolve(process.cwd(), "infra", "migrations"),
   direction: "up",
   verbose: true,
   migrationsTable: "pgmigrations",

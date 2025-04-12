@@ -1,8 +1,10 @@
+import controller from "@/models/controllers";
 import database from "infra/database";
 import { createRouter } from "next-connect";
 
-export default createRouter().get(getHandler).handler();
-
+export default createRouter().get(getHandler).handler({
+  onError: controller.handlerError,
+});
 async function getHandler(req, res) {
   const currentTime = new Date().toISOString();
 

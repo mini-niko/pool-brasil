@@ -3,14 +3,9 @@ import { createClient } from "redis";
 async function getClient() {
   let client;
 
-  if (process.env.REDIS_USERNAME) {
+  if (process.env.REDIS_URL) {
     client = await createClient({
-      username: process.env.REDIS_USERNAME,
-      password: process.env.REDIS_PASSWORD,
-      socket: {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-      },
+      url: process.env.REDIS_URL,
     });
   } else {
     client = await createClient();

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, ClockFading, Loader2 } from "lucide-react";
 import { useState } from "react";
+import Container from "@/interface/components/Container";
 
 function Index() {
   const router = useRouter();
@@ -36,7 +37,7 @@ function Index() {
   return (
     <>
       <NavigationBar />
-      <main className="py-12 px-16 flex flex-col items-center gap-12">
+      <Container>
         <div className="text-center text-pool-black">
           <h1 className="font-bold text-2xl">
             OLÁ {user?.name.split(" ")[0]}!
@@ -93,7 +94,7 @@ function Index() {
             </Button>
           </div>
         </div>
-      </main>
+      </Container>
     </>
   );
 }

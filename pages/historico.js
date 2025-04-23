@@ -23,18 +23,19 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import Container from "@/interface/components/Container";
 
 function Historico() {
   return (
     <>
       <NavigationBar />
-      <div className="flex-1 flex flex-col items-center py-12 md:px-64 gap-8">
+      <Container>
         <h1 className="text-2xl text-pool-black font-bold">Histórico</h1>
         <CustomTable />
         <Link className="underline text-pool-black" href="/">
           Voltar à página principal
         </Link>
-      </div>
+      </Container>
     </>
   );
 }
@@ -106,7 +107,9 @@ function CustomTable() {
           return (
             <TableRow key={index} className="justify-center">
               <TableCell>{appointment.professional}</TableCell>
-              <TableCell className="hidden">{appointment.service}</TableCell>
+              <TableCell className="hidden md:table-cell">
+                {appointment.service}
+              </TableCell>
               <TableCell>{appointment.date_time}</TableCell>
               <TableCell>
                 <OpenModal appointment={appointment}>

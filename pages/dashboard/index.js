@@ -155,14 +155,10 @@ function OpenDropdownMenu({ children, appointment }) {
           <OpenModal
             content={<DetailsModalContent appointment={appointment} />}
           >
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              Detalhes
-            </DropdownMenuItem>
+            <DropdownMenuItem>Detalhes</DropdownMenuItem>
           </OpenModal>
           <OpenDeleteConfirmation>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              Finalizar
-            </DropdownMenuItem>
+            <DropdownMenuItem>Finalizar</DropdownMenuItem>
           </OpenDeleteConfirmation>
         </DropdownMenuGroup>
       </DropdownMenuContent>

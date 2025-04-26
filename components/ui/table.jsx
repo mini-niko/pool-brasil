@@ -6,7 +6,7 @@ function Table({ className, ...props }) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-11/12 md:w-4/5 mx-4 overflow-x-auto border rounded-xl py-8 px-4 border-pool-dark/20"
+      className="relative  w-11/12 md:w-4/5 mx-4 overflow-x-auto border rounded-xl py-8 px-4 border-pool-dark/20"
     >
       <table
         data-slot="table"

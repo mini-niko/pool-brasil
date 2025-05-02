@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Container from "@/interface/components/Container";
 import NavigationBar from "@/interface/components/NavigationBar";
-import { BriefcaseBusiness, Users } from "lucide-react";
+import { CalendarClock, Users } from "lucide-react";
 import { useRouter } from "next/router";
 
 function Admin() {
@@ -26,12 +26,12 @@ function Options() {
     <div className="flex flex-col gap-4">
       <Button
         onClick={() => {
-          router.push("/admin/clients");
+          router.push("/admin/users");
         }}
         className="justify-center"
       >
         <Users className="h-6 w-6 mr-2" />
-        <span className="mx-auto text-base">Gerenciar clientes</span>
+        <span className="mx-auto text-base">Gerenciar usuários</span>
       </Button>
       <Button
         onClick={() => {
@@ -39,8 +39,8 @@ function Options() {
         }}
         className="text-base"
       >
-        <BriefcaseBusiness className="h-4 w-4 mr-2" />
-        <span className="mx-auto text-base">Gerenciar funcionários</span>
+        <CalendarClock />
+        <span className="mx-auto text-base">Gerenciar agendamentos</span>
       </Button>
     </div>
   );

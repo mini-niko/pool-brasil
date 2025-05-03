@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { NextResponse } from "next/server";
 
 const privateRoutes = [
@@ -20,32 +22,34 @@ export const config = {
 };
 
 async function middleware(req) {
-  const reqPath = req.nextUrl.pathname;
-  const token = req.cookies.get("sessionToken")?.value;
+  // const reqPath = req.nextUrl.pathname;
+  // const token = req.cookies.get("sessionToken")?.value;
 
-  const user = await getUser(token, req.nextUrl.origin);
+  // const user = await getUser(token, req.nextUrl.origin);
 
-  const [isPrivate, isPublic] = getPathType(reqPath);
+  // const [isPrivate, isPublic] = getPathType(reqPath);
 
-  const { redirectRoute, clearCookies } = getInfoToResponse(
-    isPrivate,
-    isPublic,
-    user,
-    token,
-  );
+  // const { redirectRoute, clearCookies } = getInfoToResponse(
+  //   isPrivate,
+  //   isPublic,
+  //   user,
+  //   token,
+  // );
 
-  if (!redirectRoute) return NextResponse.next();
+  // if (!redirectRoute) return NextResponse.next();
 
-  const res = NextResponse.redirect(new URL(redirectRoute, req.nextUrl.origin));
+  return NextResponse.next();
 
-  if (clearCookies) {
-    res.cookies.set("sessionToken", "", {
-      expires: new Date(0),
-      path: "/",
-    });
-  }
+  // const res = NextResponse.redirect(new URL(redirectRoute, req.nextUrl.origin));
 
-  return res;
+  // if (clearCookies) {
+  //   res.cookies.set("sessionToken", "", {
+  //     expires: new Date(0),
+  //     path: "/",
+  //   });
+  // }
+
+  // return res;
 }
 
 async function getUser(token, baseUrl) {

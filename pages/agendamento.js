@@ -20,6 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import Confetti from "react-confetti";
 import { Input } from "@/components/ui/input";
+import Container from "@/interface/components/Container";
 
 function Agendamento() {
   const router = useRouter();
@@ -57,7 +58,7 @@ function Agendamento() {
   return (
     <>
       <NavigationBar />
-      <div className="flex-1 md:min-h-[80vh] flex flex-col items-center just py-12 gap-12">
+      <Container>
         <h1 className="text-2xl text-pool-black font-bold">Agendamento</h1>
         {step === 1 && (
           <StepOne
@@ -90,7 +91,7 @@ function Agendamento() {
           />
         )}
         {step === 4 && <StepFour />}
-      </div>
+      </Container>
     </>
   );
 }

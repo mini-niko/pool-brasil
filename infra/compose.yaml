@@ -1,6 +1,6 @@
 services:
   database:
-    container_name: postgres-dev
+    container_name: pool-postgres-dev
     image: postgres:16.0-alpine3.18
     ports:
       - 5432:5432
@@ -8,13 +8,13 @@ services:
       - ../.env.development
 
   redis:
-    container_name: redis-dev
+    container_name: pool-redis-dev
     image: redis:8.0-M03-bookworm
     ports:
       - 6379:6379
 
   mailcatcher:
-    container_name: mailcatcher
+    container_name: pool-mailcatcher
     image: sj26/mailcatcher
     expose:
       - "${EMAIL_SMTP_PORT}"

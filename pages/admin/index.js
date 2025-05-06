@@ -35,7 +35,7 @@ function Options() {
       </Button>
       <Button
         onClick={() => {
-          router.push("/admin/professionals");
+          router.push("/admin/appointments");
         }}
         className="text-base"
       >

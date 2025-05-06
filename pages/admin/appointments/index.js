@@ -7,8 +7,6 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -44,7 +42,7 @@ import NavigationBar from "@/interface/components/NavigationBar";
 
 // React/Next
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // Ícones
 import { EllipsisVertical, Filter, RefreshCw, Search } from "lucide-react";
@@ -356,116 +354,119 @@ function AppointmentOptions({ appointment }) {
 }
 
 function AppointmentDetails({ appointment }) {
-  const users = [
-    {
-      id: "c1",
-      name: "José da Silva",
-      email: "jose.silva@gmail.com",
-      cpf: "12345678901",
-      birth_day: "1985-04-20T00:00:00Z",
-      created_at: "2025-04-10T09:00:00Z",
-      updated_at: "2025-04-10T09:00:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Rui Barbosa",
-        number: 102,
-        complement: "Apartamento 201",
-        reference: "Próximo ao mercado central",
+  const users = useMemo(
+    () => [
+      {
+        id: "c1",
+        name: "José da Silva",
+        email: "jose.silva@gmail.com",
+        cpf: "12345678901",
+        birth_day: "1985-04-20T00:00:00Z",
+        created_at: "2025-04-10T09:00:00Z",
+        updated_at: "2025-04-10T09:00:00Z",
+        features: ["client"],
+        address: {
+          state: "SC",
+          city: "Xanxerê",
+          street: "Rua Rui Barbosa",
+          number: 102,
+          complement: "Apartamento 201",
+          reference: "Próximo ao mercado central",
+        },
       },
-    },
-    {
-      id: "c2",
-      name: "Maria Fernanda",
-      email: "maria.fernanda@gmail.com",
-      cpf: "23456789012",
-      birth_day: "1990-06-15T00:00:00Z",
-      created_at: "2025-04-08T13:30:00Z",
-      updated_at: "2025-04-08T13:30:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Avenida Brasil",
-        number: 300,
-        complement: "Sala 4",
-        reference: "Em frente à prefeitura",
+      {
+        id: "c2",
+        name: "Maria Fernanda",
+        email: "maria.fernanda@gmail.com",
+        cpf: "23456789012",
+        birth_day: "1990-06-15T00:00:00Z",
+        created_at: "2025-04-08T13:30:00Z",
+        updated_at: "2025-04-08T13:30:00Z",
+        features: ["client"],
+        address: {
+          state: "SC",
+          city: "Xanxerê",
+          street: "Avenida Brasil",
+          number: 300,
+          complement: "Sala 4",
+          reference: "Em frente à prefeitura",
+        },
       },
-    },
-    {
-      id: "c3",
-      name: "Fernanda Lopes",
-      email: "fernanda.lopes@gmail.com",
-      cpf: "34567890123",
-      birth_day: "1988-03-25T00:00:00Z",
-      created_at: "2025-04-11T16:00:00Z",
-      updated_at: "2025-04-11T16:00:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Santos Dumont",
-        number: 190,
-        complement: "Casa nos fundos",
-        reference: "Ao lado do posto Shell",
+      {
+        id: "c3",
+        name: "Fernanda Lopes",
+        email: "fernanda.lopes@gmail.com",
+        cpf: "34567890123",
+        birth_day: "1988-03-25T00:00:00Z",
+        created_at: "2025-04-11T16:00:00Z",
+        updated_at: "2025-04-11T16:00:00Z",
+        features: ["client"],
+        address: {
+          state: "SC",
+          city: "Xanxerê",
+          street: "Rua Santos Dumont",
+          number: 190,
+          complement: "Casa nos fundos",
+          reference: "Ao lado do posto Shell",
+        },
       },
-    },
-    {
-      id: "c4",
-      name: "Luana Costa",
-      email: "luana.costa@gmail.com",
-      cpf: "45678901234",
-      birth_day: "1995-09-12T00:00:00Z",
-      created_at: "2025-04-07T11:10:00Z",
-      updated_at: "2025-04-07T11:10:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Coronel Passos Maia",
-        number: 250,
-        complement: "",
-        reference: "Próximo ao Fórum",
+      {
+        id: "c4",
+        name: "Luana Costa",
+        email: "luana.costa@gmail.com",
+        cpf: "45678901234",
+        birth_day: "1995-09-12T00:00:00Z",
+        created_at: "2025-04-07T11:10:00Z",
+        updated_at: "2025-04-07T11:10:00Z",
+        features: ["client"],
+        address: {
+          state: "SC",
+          city: "Xanxerê",
+          street: "Rua Coronel Passos Maia",
+          number: 250,
+          complement: "",
+          reference: "Próximo ao Fórum",
+        },
       },
-    },
-    {
-      id: "p1",
-      name: "Victor Hugo",
-      email: "victor.hugo@exemplo.com",
-      cpf: "56789012345",
-      birth_day: "1983-01-05T00:00:00Z",
-      created_at: "2025-04-01T08:00:00Z",
-      updated_at: "2025-04-01T08:00:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Victor Konder",
-        number: 88,
-        complement: "",
-        reference: "Próximo ao ginásio",
+      {
+        id: "p1",
+        name: "Victor Hugo",
+        email: "victor.hugo@exemplo.com",
+        cpf: "56789012345",
+        birth_day: "1983-01-05T00:00:00Z",
+        created_at: "2025-04-01T08:00:00Z",
+        updated_at: "2025-04-01T08:00:00Z",
+        features: ["professional"],
+        address: {
+          state: "SC",
+          city: "Xanxerê",
+          street: "Rua Victor Konder",
+          number: 88,
+          complement: "",
+          reference: "Próximo ao ginásio",
+        },
       },
-    },
-    {
-      id: "p2",
-      name: "Ana Paula",
-      email: "ana.paula@exemplo.com",
-      cpf: "67890123456",
-      birth_day: "1991-07-18T00:00:00Z",
-      created_at: "2025-04-02T14:30:00Z",
-      updated_at: "2025-04-02T14:30:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Olavo Bilac",
-        number: 77,
-        complement: "Apartamento 302",
-        reference: "Edifício Bella Vista",
+      {
+        id: "p2",
+        name: "Ana Paula",
+        email: "ana.paula@exemplo.com",
+        cpf: "67890123456",
+        birth_day: "1991-07-18T00:00:00Z",
+        created_at: "2025-04-02T14:30:00Z",
+        updated_at: "2025-04-02T14:30:00Z",
+        features: ["professional"],
+        address: {
+          state: "SC",
+          city: "Xanxerê",
+          street: "Rua Olavo Bilac",
+          number: 77,
+          complement: "Apartamento 302",
+          reference: "Edifício Bella Vista",
+        },
       },
-    },
-  ];
+    ],
+    [],
+  );
 
   const statusTranslator = {
     pending: "Pendente",
@@ -487,7 +488,7 @@ function AppointmentDetails({ appointment }) {
 
     setClient(searchClient);
     setProfessional(searchProfessional);
-  }, []);
+  }, [appointment.client.id, appointment.professional.id, users]);
 
   return (
     <Dialog>
@@ -764,8 +765,9 @@ function AppointmentDelete() {
           <AlertDialogTitle>Atenção</AlertDialogTitle>
         </AlertDialogHeader>
         <p className="text-center md:text-start">
-          Ao confirmar, você irá passar o status do agendamento para
-          "Cancelado". Tem certeza que deseja fazer isto?
+          {
+            'Ao confirmar, você irá passar o status do agendamento para "Cancelado". Tem certeza que deseja fazer isto?'
+          }
         </p>
         <AlertDialogFooter className="mt-2 flex-row justify-end">
           <AlertDialogAction>

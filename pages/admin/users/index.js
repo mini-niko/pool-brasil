@@ -47,7 +47,13 @@ import Link from "next/link";
 import { useState } from "react";
 
 // Ícones
-import { CirclePlus, EllipsisVertical, Filter, Search } from "lucide-react";
+import {
+  CirclePlus,
+  EllipsisVertical,
+  Filter,
+  RefreshCw,
+  Search,
+} from "lucide-react";
 
 function Clients() {
   const rawData = [
@@ -268,7 +274,11 @@ function SearchItems({ rawData, setData }) {
         }}
       />
       <Button onClick={onChange} variant="outline">
-        <Search className="h-4 w-4" />
+        {filter ? (
+          <Search className="h-4 w-4" />
+        ) : (
+          <RefreshCw className="h-4 w-4" />
+        )}
       </Button>
       <FilterOptions filterKey={filterKey} setFilterKey={setFilterKey}>
         <Button variant="outline">
@@ -723,7 +733,7 @@ function UserDetails({ data }) {
                     Tipo de conta
                   </Label>
                   <Input
-                    className="w-3/5 disabled:opacity-100 disabled:cursor-default"
+                    className="w-3/5 md:w-1/2 disabled:opacity-100 disabled:cursor-default"
                     id="street"
                     disabled
                     value={featureLabels[data.features[0]]}

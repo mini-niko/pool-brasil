@@ -1,7 +1,7 @@
 import database from "infra/database";
 import userValidation from "./validation/user";
 import { cpf } from "cpf-cnpj-validator";
-import authorization from "./authorization";
+import authorization from "./authentication";
 import { NotFoundError } from "errors";
 
 async function createUser(userData = {}) {
@@ -121,11 +121,32 @@ function formatUser(data) {
   };
 }
 
+function getBlankUser() {
+  return {
+    name: null,
+    email: null,
+    cpf: null,
+    birth_day: null,
+    created_at: null,
+    updated_at: null,
+    features: [],
+    address: {
+      state: null,
+      city: null,
+      street: null,
+      number: null,
+      complement: null,
+      reference: null,
+    },
+  };
+}
+
 const users = {
   getUserByLogin,
   createUser,
   getUser,
   confirmAccount,
+  getBlankUser,
 };
 
 export default users;

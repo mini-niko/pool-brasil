@@ -1,37 +1,26 @@
-import redis from "infra/redis";
-import email from "./email";
-import EmailComponent from "infra/component/email/ConfirmAccount";
+import { UnauthorizedError } from "@/errors";
 
-function generateToken() {
-  const array = new Uint8Array(16); // eslint-disable-line no-undef
-  crypto.getRandomValues(array);
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, 0)).join("");
-}
+function canRequest(features) {
+  return function (request, response, next) {
+    const user = request.context.user;
 
-async function saveValueWithToken(prefix, value) {
-  const token = generateToken();
+    const hasPermission = features.some((feature) =>
+      user.features.includes(feature),
+    );
 
-  await redis.set(`${prefix}:${token}`, value);
+    if (!hasPermission) {
+      throw new UnauthorizedError({
+        message: "O usuário não pode executar a operação requisitada.",
+        action: `Verifique se o usuário possui algumas das seguintes permissões: "${features.join('", "')}".`,
+      });
+    }
 
-  return token;
-}
-
-async function getValueWithToken(prefix, token) {
-  const value = await redis.search(`${prefix}:${token}`);
-
-  return value;
-}
-
-async function sendEmailToConfirmAccount(emailAdress, token) {
-  const body = <EmailComponent token={token} />;
-
-  email.sendMail(emailAdress, "Confirmação da conta", body);
+    return next();
+  };
 }
 
 const authorization = {
-  saveValueWithToken,
-  getValueWithToken,
-  sendEmailToConfirmAccount,
+  canRequest,
 };
 
 export default authorization;

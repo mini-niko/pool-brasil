@@ -1,4 +1,4 @@
-import authorization from "./authorization";
+import authorization from "./authentication";
 import { serialize } from "cookie";
 
 function setSessionCookieInResponse(res, token) {

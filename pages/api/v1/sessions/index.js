@@ -1,3 +1,4 @@
+import authentication from "@/models/authentication";
 import { NotFoundError, UnauthorizedError, ValidationError } from "errors";
 import controller from "models/controllers";
 import sessions from "models/sessions";
@@ -5,6 +6,7 @@ import users from "models/users";
 import { createRouter } from "next-connect";
 
 export default createRouter()
+  .use(authentication.injectUser)
   .get(getHandler)
   .post(postHandler)
   .handler({ onError: controller.handlerError });

@@ -2,7 +2,7 @@ import retry from "async-retry";
 import database from "infra/database";
 import migrator from "infra/migrator";
 import redis from "infra/redis";
-import authorization from "models/authorization";
+import authentication from "models/authentication.js";
 import users from "models/users";
 import { parseSetCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -68,7 +68,7 @@ function parseCookiesFromResponse(response) {
 }
 
 async function createConfirmToken(userId) {
-  return await authorization.saveValueWithToken("confirmation", userId);
+  return await authentication.saveValueWithToken("confirmation", userId);
 }
 
 const orchestrator = {

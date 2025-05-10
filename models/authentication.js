@@ -5,20 +5,24 @@ import sessions from "./sessions";
 import users from "./users";
 
 async function injectUser(request, response, next) {
-  const token = request.cookies["sessionToken"];
+  try {
+    const token = request.cookies["sessionToken"];
 
-  const userSession = await sessions.getUserFromSession(token);
+    const userSession = await sessions.getUserFromSession(token);
 
-  const user = userSession
-    ? await users.getUser("id", userSession.id)
-    : users.getBlankUser();
+    const user = userSession
+      ? await users.getUser("id", userSession.id)
+      : users.getBlankUser();
 
-  request.context = {
-    ...request.context,
-    user,
-  };
+    request.context = {
+      ...request.context,
+      user,
+    };
 
-  next();
+    next();
+  } catch (err) {
+    console.log("Ocorreu um erro aqui.");
+  }
 }
 
 function generateToken() {

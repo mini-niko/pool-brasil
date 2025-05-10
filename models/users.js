@@ -1,7 +1,7 @@
 import database from "infra/database";
 import userValidation from "./validation/user";
 import { cpf } from "cpf-cnpj-validator";
-import authorization from "./authentication";
+import authentication from "models/authentication.js";
 import { NotFoundError } from "errors";
 
 async function createUser(userData = {}) {
@@ -78,7 +78,7 @@ async function updateUser(searchKey, searchValue, updateKey, updateValue) {
 }
 
 async function confirmAccount(token) {
-  const userId = await authorization.getValueWithToken("confirmation", token);
+  const userId = await authentication.getValueWithToken("confirmation", token);
 
   if (!userId)
     throw new NotFoundError({

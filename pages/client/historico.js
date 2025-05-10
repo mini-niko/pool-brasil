@@ -32,7 +32,7 @@ function Historico() {
       <Container>
         <h1 className="text-2xl text-pool-black font-bold">Histórico</h1>
         <CustomTable />
-        <Link className="underline text-pool-black" href="/">
+        <Link className="underline text-pool-black" href="/client">
           Voltar à página principal
         </Link>
       </Container>

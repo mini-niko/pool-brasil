@@ -2,8 +2,6 @@ import { InternalServerError } from "errors";
 import snakeize from "snakeize";
 
 function handlerError(err, req, res) {
-  console.error(err);
-
   let responseError = err;
 
   if (responseError.statusCode === 500 || !responseError.statusCode) {

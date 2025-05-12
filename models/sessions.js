@@ -1,4 +1,4 @@
-import authorization from "./authorization";
+import authentication from "models/authentication.js";
 import { serialize } from "cookie";
 
 function setSessionCookieInResponse(res, token) {
@@ -20,7 +20,7 @@ async function setSessionInRedis(user) {
     features: user.features,
   });
 
-  const token = await authorization.saveValueWithToken("session", sessionUser);
+  const token = await authentication.saveValueWithToken("session", sessionUser);
 
   return token;
 }
@@ -34,7 +34,7 @@ async function createSession(user, res) {
 }
 
 async function getUserFromSession(sessionToken) {
-  const query = await authorization.getValueWithToken("session", sessionToken);
+  const query = await authentication.getValueWithToken("session", sessionToken);
 
   if (!query) return null;
 

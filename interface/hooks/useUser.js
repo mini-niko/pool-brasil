@@ -16,9 +16,11 @@ export const UserProvider = ({ children }) => {
     setIsLoading(true);
     const request = await fetch("/api/v1/sessions");
 
-    const user = await request.json();
+    if (request.status === 200) {
+      const user = await request.json();
+      setUser(user);
+    }
 
-    setUser(user);
     setIsLoading(false);
   }, []);
 
@@ -30,7 +32,7 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (!user) fetchUser();
-  });
+  }, [user, fetchUser]);
 
   return (
     <UserContext.Provider value={userContextValue}>

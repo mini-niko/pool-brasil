@@ -2,7 +2,7 @@ import retry from "async-retry";
 import database from "infra/database";
 import migrator from "infra/migrator";
 import redis from "infra/redis";
-import authorization from "models/authorization";
+import authentication from "models/authentication.js";
 import users from "models/users";
 import { parseSetCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -40,7 +40,7 @@ async function setSession(user) {
     features: user.features,
   });
 
-  const token = "123456789";
+  const token = authentication.generateToken();
 
   await redis.set(`session:${token}`, setInRedis);
 
@@ -51,7 +51,25 @@ async function upMigrations() {
   await migrator.runPendingMigrations();
 }
 
-async function setMockUser(user) {
+async function createUser(features) {
+  const user = {
+    name: "Mock User",
+    cpf: "35638417052",
+    email: "example@mail.com",
+    password: "12345678",
+    confirm_password: "12345678",
+    birth_day: new Date("01/01/2000"),
+    features,
+    address: {
+      state: "SC",
+      city: "Xanxerê",
+      street: "Avenida Brasil",
+      number: 1,
+      complement: "apto 4",
+      reference: "Ao lado do mercado XXX",
+    },
+  };
+
   const userResponse = await users.createUser(user);
 
   userResponse.created_at = userResponse.created_at.toISOString();
@@ -68,7 +86,7 @@ function parseCookiesFromResponse(response) {
 }
 
 async function createConfirmToken(userId) {
-  return await authorization.saveValueWithToken("confirmation", userId);
+  return await authentication.saveValueWithToken("confirmation", userId);
 }
 
 const orchestrator = {
@@ -77,7 +95,7 @@ const orchestrator = {
   cleanRedis,
   setSession,
   upMigrations,
-  setMockUser,
+  createUser,
   parseCookiesFromResponse,
   createConfirmToken,
 };

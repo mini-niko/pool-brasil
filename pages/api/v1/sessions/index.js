@@ -1,13 +1,17 @@
-import { NotFoundError, UnauthorizedError, ValidationError } from "errors";
-import controller from "models/controllers";
+import authentication from "@/models/authentication";
+import { NotFoundError, UnauthorizedError } from "errors";
+import controller from "models/controllers.js";
 import sessions from "models/sessions";
 import users from "models/users";
 import { createRouter } from "next-connect";
 
 export default createRouter()
+  .use(authentication.injectUser)
   .get(getHandler)
   .post(postHandler)
-  .handler({ onError: controller.handlerError });
+  .handler({
+    onError: controller.handlerError,
+  });
 
 async function postHandler(req, res) {
   const login = req.body;
@@ -27,23 +31,15 @@ async function postHandler(req, res) {
 }
 
 async function getHandler(req, res) {
-  const token = req.query.token || req.cookies.sessionToken;
+  const user = req.context.user;
 
-  if (!token)
-    throw new ValidationError({
-      message: "Expected a token in the request, but it was not sent.",
-      action: "Send an token in request.",
-      stack: new Error().stack,
-    });
-
-  const user = await sessions.getUserFromSession(token);
-
-  if (!user)
+  if (!user || !user.id) {
     throw new NotFoundError({
       message: "Not found an user with this session token.",
       action: "Send an valid session token or create a new session.",
       stack: new Error().stack,
     });
+  }
 
   res.status(200).json(user);
 }

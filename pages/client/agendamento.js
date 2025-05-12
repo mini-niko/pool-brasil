@@ -21,7 +21,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Confetti from "react-confetti";
 import { Input } from "@/components/ui/input";
 import Container from "@/interface/components/Container";
-
 function Agendamento() {
   const router = useRouter();
 
@@ -64,7 +63,7 @@ function Agendamento() {
           <StepOne
             data={data}
             next={() => setStep(2)}
-            back={() => router.push("/")}
+            back={() => router.push("/client")}
           />
         )}
         {step === 2 && (
@@ -549,7 +548,9 @@ function StepFour() {
         </div>
         <PartyPopper className="h-12 w-12 text-pool-light hidden md:block" />
       </div>
-      <Button onClick={() => router.push("/")}>Voltar à página inicial</Button>
+      <Button onClick={() => router.push("/client")}>
+        Voltar à página inicial
+      </Button>
     </div>
   );
 }

@@ -1,30 +1,14 @@
 import users from "models/users";
 import orchestrator from "test/orchestrator";
 
-let mockUser = {
-  name: "Mock User",
-  cpf: "35638417052",
-  email: "example@mail.com",
-  password: "12345678",
-  confirm_password: "12345678",
-  birth_day: new Date("01/01/2000"),
-  address: {
-    state: "SC",
-    city: "Xanxerê",
-    street: "Avenida Brasil",
-    number: 1,
-    complement: "apto 4",
-    reference: "Ao lado do mercado XXX",
-  },
-};
-
+let mockUser;
 let token;
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  mockUser = await orchestrator.setMockUser(mockUser);
+  mockUser = await orchestrator.createUser(["client"]);
   token = await orchestrator.createConfirmToken(mockUser.id);
 });
 

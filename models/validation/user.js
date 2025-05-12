@@ -29,6 +29,38 @@ const userSchema = Joi.object({
   password: Joi.string().min(8).max(60).required(),
   confirm_password: Joi.valid(Joi.ref("password")).required(),
   birth_day: Joi.date().iso().max(dateMinimumAge).required(),
+  features: Joi.array()
+    .items(Joi.string().valid("client", "admin", "professional"))
+    .required(),
+  address: Joi.object({
+    state: Joi.string().alphanum().length(2).required(),
+    city: Joi.string()
+      .min(3)
+      .max(25)
+      .required()
+      .custom(customFilters.utcString),
+    street: Joi.string()
+      .min(3)
+      .max(100)
+      .required()
+      .custom(customFilters.utcString),
+    number: Joi.number().integer().min(0).max(999999).required(),
+    complement: Joi.string().min(0).max(20).custom(customFilters.utcString),
+    reference: Joi.string().min(0).max(40).custom(customFilters.utcString),
+  }),
+});
+
+const publicUserSchema = Joi.object({
+  id: Joi.string().length(36).required(),
+  name: Joi.string().min(3).max(30).required().custom(customFilters.name),
+  cpf: Joi.string().required().custom(customFilters.cpf),
+  email: Joi.string().email().required(),
+  birth_day: Joi.date().iso().max(dateMinimumAge).required(),
+  created_at: Joi.date().iso().required(),
+  updated_at: Joi.date().iso().required(),
+  features: Joi.array()
+    .items(Joi.string().valid("client", "admin", "professional"))
+    .required(),
   address: Joi.object({
     state: Joi.string().alphanum().length(2).required(),
     city: Joi.string()
@@ -65,7 +97,6 @@ function validate(userData) {
     throw new ValidationError({
       message: "Cannot parse the sent data.",
       action: "Check if the data is a valid JSON and try again.",
-      stack: new Error().stack,
     });
   }
 
@@ -74,7 +105,6 @@ function validate(userData) {
   if (error)
     throw new ValidationError({
       message: error.message,
-      stack: new Error().stack,
     });
 }
 
@@ -107,8 +137,10 @@ async function checkDuplicate(field, userData) {
 }
 
 const userValidation = {
-  validate,
   alreadyInUse,
+  userSchema,
+  publicUserSchema,
+  validate,
   validID,
 };
 

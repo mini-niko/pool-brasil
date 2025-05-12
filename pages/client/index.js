@@ -62,7 +62,7 @@ function Index() {
                 setAgendaLabel(
                   <Loader2 className="animate-spin !h-8 !w-8 m-2" />,
                 );
-                router.push("/agendamento");
+                router.push("/client/agendamento");
               }}
               className="flex -mt-11 w-40 py-4 px-8 text-center text-md h-fit font-light text-pool-dark"
             >
@@ -86,7 +86,7 @@ function Index() {
                 setHistoryLabel(
                   <Loader2 className="animate-spin !h-8 !w-8 m-2" />,
                 );
-                router.push("/historico");
+                router.push("/client/historico");
               }}
               className="-mt-11 w-40 py-4 px-8 text-center text-md h-fit font-light text-pool-dark"
             >

@@ -1,5 +1,3 @@
-import authentication from "@/models/authentication";
-import authorization from "@/models/authorization";
 import controller from "@/models/controllers";
 import database from "infra/database";
 import { createRouter } from "next-connect";

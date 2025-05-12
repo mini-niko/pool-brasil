@@ -1,4 +1,3 @@
-import { InternalServerError } from "errors";
 import { Client } from "pg";
 
 async function getNewClient() {

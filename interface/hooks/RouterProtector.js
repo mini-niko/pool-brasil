@@ -21,7 +21,7 @@ export function RouterProtector({ children }) {
 
     const routeToRedirect = routes.private[user.features[0]].principal;
     push(routeToRedirect);
-  }, [isLoading, user, pathname]);
+  }, [isLoading, user, pathname, push]);
 
   return (
     <>

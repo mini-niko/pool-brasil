@@ -4,7 +4,6 @@ import { UserProvider } from "interface/hooks/useUser.js";
 import { Geist } from "next/font/google";
 import { RouterProtector } from "@/interface/hooks/RouterProtector";
 import routes from "@/infra/routes";
-import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
 
 const geist = Geist({ subsets: ["latin"] });

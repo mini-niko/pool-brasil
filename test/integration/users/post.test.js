@@ -1,14 +1,55 @@
 import orchestrator from "test/orchestrator";
 
+let loggedUser;
+let sessionToken;
+
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations(() => {});
   await orchestrator.cleanRedis();
+  loggedUser = await orchestrator.createUser(["admin"]);
+  sessionToken = await orchestrator.setSession(loggedUser);
 });
 
 describe("POST to /api/v1/users", () => {
+  const user = {
+    name: "Test",
+    cpf: "07563801030",
+    email: "example@test.com",
+    password: "12345678",
+    confirm_password: "12345678",
+    birth_day: new Date("01/01/2000"),
+    features: ["client"],
+    address: {
+      state: "SC",
+      city: "Xanxerê",
+      street: "Avenida Brasil",
+      number: 1,
+      complement: "apto 4",
+      reference: "Ao lado do mercado XXX",
+    },
+  };
+
   describe("Annonymous user", () => {
+    test("Creating an user", async () => {
+      let validUser = {
+        ...user,
+      };
+
+      const response = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(validUser),
+      });
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe("Admin user", () => {
     describe("Creating an user", () => {
       const user = {
         name: "Test",
@@ -17,6 +58,7 @@ describe("POST to /api/v1/users", () => {
         password: "12345678",
         confirm_password: "12345678",
         birth_day: new Date("01/01/2000"),
+        features: ["client"],
         address: {
           state: "SC",
           city: "Xanxerê",
@@ -36,6 +78,7 @@ describe("POST to /api/v1/users", () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Cookie: `sessionToken=${sessionToken}`,
           },
           body: JSON.stringify(validUser),
         });
@@ -43,7 +86,7 @@ describe("POST to /api/v1/users", () => {
         expect(response.status).toBe(201);
       });
 
-      describe("Invalid:", () => {
+      describe("Invalid", () => {
         describe("With existent", () => {
           test("Name", async () => {
             const nameExistUser = {
@@ -55,6 +98,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(nameExistUser),
             });
@@ -79,6 +123,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(cpfExistUser),
             });
@@ -104,6 +149,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(emailExistUser),
             });
@@ -130,6 +176,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(withoutNameUser),
             });
@@ -154,6 +201,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(withoutCpfUser),
             });
@@ -178,6 +226,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(withoutEmailUser),
             });
@@ -202,6 +251,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(withoutPasswordUser),
             });
@@ -226,6 +276,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(withoutConfirmPasswordUser),
             });
@@ -250,6 +301,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(withoutBirthdayUser),
             });
@@ -279,6 +331,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(user),
             });
@@ -308,6 +361,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(user),
             });
@@ -339,6 +393,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(user),
             });
@@ -368,6 +423,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(user),
             });
@@ -399,6 +455,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(user),
             });
@@ -426,6 +483,7 @@ describe("POST to /api/v1/users", () => {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Cookie: `sessionToken=${sessionToken}`,
               },
               body: JSON.stringify(user),
             });

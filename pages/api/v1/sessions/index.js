@@ -33,17 +33,6 @@ async function postHandler(req, res) {
 async function getHandler(req, res) {
   const user = req.context.user;
 
-  asdasd;
-
-  // if (!token)
-  //   throw new ValidationError({
-  //     message: "Expected a token in the request, but it was not sent.",
-  //     action: "Send an token in request.",
-  //     stack: new Error().stack,
-  //   });
-
-  // const user = await sessions.getUserFromSession(token);
-
   if (!user || !user.id) {
     throw new NotFoundError({
       message: "Not found an user with this session token.",

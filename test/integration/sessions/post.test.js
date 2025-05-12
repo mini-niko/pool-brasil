@@ -1,28 +1,13 @@
 import redis from "infra/redis";
 import orchestrator from "test/orchestrator.js";
 
-let mockUser = {
-  name: "Mock User",
-  cpf: "35638417052",
-  email: "example@mail.com",
-  password: "12345678",
-  confirm_password: "12345678",
-  birth_day: new Date("01/01/2000"),
-  address: {
-    state: "SC",
-    city: "Xanxerê",
-    street: "Avenida Brasil",
-    number: 1,
-    complement: "apto 4",
-    reference: "Ao lado do mercado XXX",
-  },
-};
+let mockUser;
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  mockUser = await orchestrator.setMockUser(mockUser);
+  mockUser = await orchestrator.createUser(["client"]);
 
   await orchestrator.cleanRedis();
 });
@@ -38,13 +23,14 @@ describe("POST to /api/v1/sessions", () => {
           },
           body: JSON.stringify({
             email: mockUser.email,
-            password: mockUser.password,
+            password: "12345678",
           }),
         });
 
         expect(response.status).toBe(201);
 
         const body = await response.json();
+
         const responseToken = body.token;
 
         expect(typeof responseToken).toBe("string");

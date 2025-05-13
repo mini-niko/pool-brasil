@@ -6,7 +6,7 @@ beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  mockUser = await orchestrator.createUser(["client"]);
+  mockUser = await orchestrator.createUser("client");
 });
 
 describe("GET to /api/v1/user", () => {

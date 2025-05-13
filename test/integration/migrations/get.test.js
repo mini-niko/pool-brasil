@@ -7,7 +7,7 @@ beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  loggedUser = await orchestrator.createUser(["admin"]);
+  loggedUser = await orchestrator.createUser("admin");
   sessionToken = await orchestrator.setSession(loggedUser);
 });
 
@@ -47,8 +47,4 @@ describe("GET to /api/v1/migrations", () => {
       expect(body).toHaveLength(0);
     });
   });
-});
-
-afterAll(async () => {
-  await orchestrator.upMigrations();
 });

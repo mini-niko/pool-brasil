@@ -8,7 +8,7 @@ beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  mockUser = await orchestrator.createUser(["client"]);
+  mockUser = await orchestrator.createUser("client");
   token = await orchestrator.createConfirmToken(mockUser.id);
 });
 

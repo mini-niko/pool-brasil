@@ -8,7 +8,7 @@ beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  mockUser = await orchestrator.createUser(["client"]);
+  mockUser = await orchestrator.createUser("client");
 
   await orchestrator.cleanRedis();
   sessionToken = await orchestrator.setSession(mockUser);

@@ -7,7 +7,7 @@ beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  mockUser = await orchestrator.createUser(["client"]);
+  mockUser = await orchestrator.createUser("client");
 
   await orchestrator.cleanRedis();
 });
@@ -23,7 +23,7 @@ describe("POST to /api/v1/sessions", () => {
           },
           body: JSON.stringify({
             email: mockUser.email,
-            password: "12345678",
+            password: "carlaSenha789",
           }),
         });
 

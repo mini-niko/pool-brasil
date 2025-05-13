@@ -7,7 +7,7 @@ beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  const mockUser = await orchestrator.createUser(["admin"]);
+  const mockUser = await orchestrator.createUser("admin");
   sessionToken = await orchestrator.setSession(mockUser);
 });
 

@@ -8,7 +8,7 @@ beforeAll(async () => {
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations(() => {});
   await orchestrator.cleanRedis();
-  loggedUser = await orchestrator.createUser(["admin"]);
+  loggedUser = await orchestrator.createUser("admin");
   sessionToken = await orchestrator.setSession(loggedUser);
 });
 

@@ -16,8 +16,6 @@ function Login() {
 }
 
 function LoginForm() {
-  const { fetchUser } = useUser();
-
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,8 +37,7 @@ function LoginForm() {
     });
 
     if (status === 201) {
-      fetchUser();
-      router.replace("/");
+      router.replace("/client");
     }
   }
 

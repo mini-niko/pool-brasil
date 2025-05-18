@@ -4,9 +4,9 @@ import { serialize } from "cookie";
 function setSessionCookieInResponse(res, token) {
   const cookieConfig = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     maxAge: parseInt(process.env.SESSION_TIME),
-    sameSite: "Strict",
+    sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
     path: "/",
   };
 

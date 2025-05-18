@@ -44,7 +44,6 @@ function ContaConfirmada() {
           setIsOk(false);
         }
       } catch (err) {
-        console.error(err);
         setIsOk(false);
       } finally {
         setIsLoading(false);

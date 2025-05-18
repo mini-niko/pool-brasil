@@ -14,11 +14,14 @@ export const UserProvider = ({ children }) => {
 
   const fetchUser = useCallback(async () => {
     setIsLoading(true);
+
     const request = await fetch("/api/v1/sessions");
 
     if (request.status === 200) {
       const user = await request.json();
       setUser(user);
+    } else {
+      fetch("/api/v1/sessions/logout");
     }
 
     setIsLoading(false);

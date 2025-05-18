@@ -108,8 +108,6 @@ function Registro() {
       },
     };
 
-    console.log(user);
-
     const response = await fetch("/api/v1/users", {
       method: "POST",
       headers: {

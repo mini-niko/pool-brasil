@@ -187,22 +187,27 @@ async function confirmAccount(token) {
 function formatUser(data) {
   if (!data) return;
 
+  const {
+    user_id,
+    state,
+    city,
+    street,
+    number,
+    complement,
+    reference,
+    ...rest
+  } = data;
+
   return {
-    id: data.user_id,
-    name: data.name,
-    cpf: data.cpf,
-    email: data.email,
-    features: data.features,
-    birth_day: data.birth_day,
-    created_at: data.created_at,
-    updated_at: data.updated_at,
+    ...rest,
+    id: user_id,
     address: {
-      state: data.state,
-      city: data.city,
-      street: data.street,
-      number: data.number,
-      complement: data.complement,
-      reference: data.reference,
+      state,
+      city,
+      street,
+      number,
+      complement,
+      reference,
     },
   };
 }

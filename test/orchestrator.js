@@ -1,3 +1,4 @@
+import appointment from "@/models/appointment";
 import retry from "async-retry";
 import database from "infra/database";
 import migrator from "infra/migrator";
@@ -115,6 +116,47 @@ async function createUser(feature) {
   return userResponse;
 }
 
+async function createAppointment(clientId, professionalId, hours) {
+  const date = new Date().set;
+
+  const appointmentData = {
+    client_id: clientId,
+    professional_id: professionalId,
+    date_time: generateDateTimeForAppointment(hours),
+    service_id: 1,
+    location: {
+      state: "SC",
+      city: "XANXERÊ",
+      street: "Rua XXX",
+      number: "2",
+      complement: "Apartamento 1",
+      reference: "Árvores",
+      latitude: -24.123456,
+      longitude: -24.123456,
+    },
+  };
+
+  const newAppointment = await appointment.createAppointment(appointmentData);
+
+  return newAppointment;
+
+  function generateDateTimeForAppointment(hours) {
+    const date = new Date();
+
+    const actualDay = new Date().getDay();
+
+    const daysInFuture = actualDay === 0 || actualDay === 4 ? 8 : 7;
+
+    date.setDate(new Date().getDate() + daysInFuture);
+
+    const minute = hours * 60;
+
+    date.setHours(0, minute, 0, 0);
+
+    return date.toISOString();
+  }
+}
+
 function parseCookiesFromResponse(response) {
   const setCookie = response.headers.get("set-cookie");
 
@@ -126,14 +168,15 @@ async function createConfirmToken(userId) {
 }
 
 const orchestrator = {
-  waitForAllServices,
+  createAppointment,
+  createConfirmToken,
   cleanDatabase,
   cleanRedis,
-  setSession,
-  upMigrations,
   createUser,
   parseCookiesFromResponse,
-  createConfirmToken,
+  setSession,
+  upMigrations,
+  waitForAllServices,
 };
 
 export default orchestrator;

@@ -20,10 +20,10 @@ async function postHandler(req, res) {
   res.status(201).json(newAppointment);
 }
 
-async function getHandler() {
+async function getHandler(req, res) {
   const userId = req.context.user.id;
 
-  const appointments = await appointment.getAppointmentsFromUserId(userId);
+  const appointments = await appointment.getAllAppointmentsFromUserId(userId);
 
-  await appointment;
+  return res.status(200).json(appointments);
 }

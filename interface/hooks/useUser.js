@@ -21,7 +21,7 @@ export const UserProvider = ({ children }) => {
       const user = await request.json();
       setUser(user);
     } else {
-      fetch("/api/v1/sessions/logout");
+      await fetch("/api/v1/sessions/logout");
     }
 
     setIsLoading(false);

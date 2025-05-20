@@ -35,8 +35,8 @@ function OpenMap({ setCoordinates }) {
 
     function onPosition(position) {
       setCoordinates({
-        latitude: parseFloat(position.coords.latitude.toFixed(5)),
-        longitude: parseFloat(position.coords.longitude.toFixed(5)),
+        latitude: parseFloat(position.coords.latitude.toFixed(6)),
+        longitude: parseFloat(position.coords.longitude.toFixed(6)),
       });
 
       getMap(
@@ -99,8 +99,8 @@ function getMap(mapRef, actualCoords, startWithPin, setCoordinates) {
     const coords = toLonLat(e.coordinate);
 
     setCoordinates({
-      latitude: parseFloat(coords[1].toFixed(5)),
-      longitude: parseFloat(coords[0].toFixed(5)),
+      latitude: parseFloat(coords[1].toFixed(6)),
+      longitude: parseFloat(coords[0].toFixed(6)),
     });
 
     markerSource.clear();

@@ -192,6 +192,110 @@ function calculateAvaliableHours(date, scheduledHours) {
   return hoursList;
 }
 
+async function getAllAppointmentsFromUserId(userId) {
+  userValidation.validID(userId);
+
+  const response = await database.query(
+    `
+    SELECT
+      a.id,
+      a.date_time,
+      a.status,
+      a.created_at,
+      s.type,
+      uc.name as client_name,
+      uc.email as client_email,
+      pc.name as professional_name,
+      pc.email as professional_email,
+      al.latitude,
+      al.longitude,
+      al.state,
+      al.city,
+      al.street,
+      al.number,
+      al.complement,
+      al.reference
+    FROM appointments a
+    LEFT JOIN users uc
+    ON 
+      a.client_id = uc.id
+    LEFT JOIN users pc
+    ON 
+      a.professional_id = pc.id
+    LEFT JOIN appointment_location al
+    ON 
+      a.appointment_location_id = al.id
+    LEFT JOIN appointments_services aps
+    ON 
+      a.id = aps.appointment_id
+    LEFT JOIN services s
+    ON
+      s.id = aps.service_id
+    WHERE
+      a.client_id = $1
+      OR
+      a.professional_id = $1
+    ;`,
+    [userId],
+  );
+
+  const appointments = response.rows.map(formatAppointment);
+
+  return appointments;
+}
+
+function formatAppointment(appointment) {
+  const {
+    client_name,
+    client_email,
+    professional_name,
+    professional_email,
+    latitude,
+    longitude,
+    state,
+    city,
+    street,
+    number,
+    complement,
+    reference,
+    ...rest
+  } = appointment;
+
+  const statusList = {
+    pending: "Pendente",
+    confirmed: "Confirmado",
+    cancelled: "Cancelado",
+    done: "Finalizado",
+  };
+
+  const address = `${street}, ${number}${
+    complement ? `, complement` : ""
+  }, ${city
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ")}, ${state}`;
+
+  return {
+    ...rest,
+    status: statusList[appointment.status],
+    client: {
+      name: client_name,
+      email: client_email,
+    },
+    professional: {
+      name: professional_name,
+      email: professional_email,
+    },
+    location: {
+      longitude,
+      latitude,
+      address,
+      reference,
+    },
+  };
+}
+
 async function getAllProfessionals() {
   const response = await database.query(
     `
@@ -217,6 +321,7 @@ async function getAllServices() {
 
 const appointment = {
   createAppointment,
+  getAllAppointmentsFromUserId,
   getAllProfessionals,
   getAllServices,
   getAvaliableHoursForProfessional,

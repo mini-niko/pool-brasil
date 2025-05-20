@@ -33,6 +33,10 @@ async function createSession(user, res) {
   return token;
 }
 
+async function deleteSession(token) {
+  await authentication.deleteValueWithToken("sessions", token);
+}
+
 async function getUserFromSession(sessionToken) {
   const query = await authentication.getValueWithToken("session", sessionToken);
 
@@ -46,6 +50,7 @@ async function getUserFromSession(sessionToken) {
 const sessions = {
   createSession,
   getUserFromSession,
+  deleteSession,
 };
 
 export default sessions;

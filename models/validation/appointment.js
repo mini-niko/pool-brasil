@@ -54,6 +54,7 @@ function validate(appointmentData) {
     throw new ValidationError({
       message: "Cannot parse the sent data.",
       action: "Check if the data is a valid JSON and try again.",
+      stack: new Error().stack,
     });
   }
 
@@ -62,6 +63,7 @@ function validate(appointmentData) {
   if (error) {
     throw new ValidationError({
       message: error.message,
+      stack: new Error().stack,
     });
   }
 }
@@ -73,6 +75,7 @@ function validateDate(date) {
     throw new ValidationError({
       message: "A data enviada não é uma data válida.",
       action: "Verifique a data e tente novamente.",
+      stack: new Error().stack,
     });
   }
 }

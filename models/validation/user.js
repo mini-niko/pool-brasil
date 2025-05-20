@@ -87,6 +87,7 @@ function validID(id) {
     throw new ValidationError({
       message: '"id" must be and uuid id.',
       action: "Try send an valid id.",
+      stack: new Error().stack,
     });
 }
 

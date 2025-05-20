@@ -1,22 +1,25 @@
 import controller from "@/models/controllers";
 import { createRouter } from "next-connect";
-import user from "../../user";
 import { UnauthorizedError } from "@/errors";
+import { serialize } from "cookie";
+import sessions from "@/models/sessions";
 
 export default createRouter().get(getHandler).handler({
   onError: controller.handlerError,
 });
 async function getHandler(req, res) {
-  if (req.context?.user)
-    throw new UnauthorizedError({
-      message: "Não é possível deslogar um usuário não logado.",
-      action: "",
-    });
+  const token = req.cookies["sessionToken"];
 
-  res.setHeader(
-    "Set-Cookie",
-    "sessionToken=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax",
-  );
+  sessions.deleteSession(token);
 
-  res.status(200).json();
+  res.setHeader("Set-Cookie", [
+    serialize("sessionToken", "invalid", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: -1,
+    }),
+  ]);
+
+  res.status(200).end();
 }

@@ -73,8 +73,9 @@ async function getUser(key, value) {
   const response = await database.query(
     `
     SELECT 
+      u.id as user_id,
       u.*, 
-      a.* 
+      a.*
     FROM 
       users u
     LEFT JOIN 
@@ -93,15 +94,14 @@ async function getUserByLogin(email, password) {
   const response = await database.query(
     `
     SELECT 
-      u.id,
       u.name,
-      u.cpf,
       u.email,
       u.features,
       u.birth_day,
       u.created_at,
       u.updated_at,
-      a.* 
+      a.*,
+      u.id
     FROM 
       users u
     LEFT JOIN

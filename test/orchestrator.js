@@ -117,8 +117,6 @@ async function createUser(feature) {
 }
 
 async function createAppointment(clientId, professionalId, hours) {
-  const date = new Date().set;
-
   const appointmentData = {
     client_id: clientId,
     professional_id: professionalId,

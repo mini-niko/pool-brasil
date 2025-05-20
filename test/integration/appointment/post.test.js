@@ -74,7 +74,7 @@ describe("POST to /api/v1/appointment", () => {
           expect(body.id).toEqual(1);
           expect(body.client_id).toEqual(clientUser.id);
           expect(body.professional_id).toEqual(professionalUser.id);
-          expect(body.date_time).toEqual("2030-01-02T07:15:00.000Z");
+          expect(body.date_time).toEqual(appointment.date_time.toISOString());
           expect(body.status).toEqual("pending");
           expect(body.appointment_location_id).toEqual(1);
           expect(body.location).toEqual(appointment.location);
@@ -115,7 +115,7 @@ describe("POST to /api/v1/appointment", () => {
           expect(body.id).toEqual(2);
           expect(body.client_id).toEqual(clientUser.id);
           expect(body.professional_id).toEqual(professionalUser.id);
-          expect(body.date_time).toEqual("2030-01-02T07:15:00.000Z");
+          expect(body.date_time).toEqual(appointment.date_time.toISOString());
           expect(body.status).toEqual("pending");
           expect(body.appointment_location_id).toEqual(2);
           expect(body.location).toEqual({
@@ -159,7 +159,7 @@ describe("POST to /api/v1/appointment", () => {
           expect(body.id).toEqual(3);
           expect(body.client_id).toEqual(clientUser.id);
           expect(body.professional_id).toEqual(professionalUser.id);
-          expect(body.date_time).toEqual("2030-01-02T07:15:00.000Z");
+          expect(body.date_time).toEqual(appointment.date_time.toISOString());
           expect(body.status).toEqual("pending");
           expect(body.appointment_location_id).toEqual(3);
           expect(body.location).toEqual({

@@ -44,7 +44,7 @@ function Historico() {
 }
 
 function CustomTable() {
-  const { isLoading, data } = useSWR(`/api/v1/appointment`, fetcher);
+  const { data } = useSWR(`/api/v1/appointment`, fetcher);
 
   return (
     <Table className="">

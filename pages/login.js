@@ -2,7 +2,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Form from "@/components/ui/Form";
-import useUser from "interface/hooks/useUser";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import DefaultContainer from "@/components/ui/defaultContainer";

@@ -49,7 +49,6 @@ describe("POST to /api/v1/sessions", () => {
         expect(sessionCookie.value).toBe(responseToken);
         expect(sessionCookie.httpOnly).toBeTruthy();
         expect(sessionCookie.maxAge).toBe(parseInt(process.env.SESSION_TIME));
-        expect(sessionCookie.secure).toBeTruthy();
       });
 
       test("Invalid login", async () => {

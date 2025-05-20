@@ -9,7 +9,7 @@ import { OSM } from "ol/source";
 import VectorSource from "ol/source/Vector";
 import Icon from "ol/style/Icon";
 import Style from "ol/style/Style";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 class GoToButtonControl extends Control {
   constructor(onClick) {
@@ -50,7 +50,7 @@ function OpenMap({ setCoordinates }) {
     function onError() {
       getMap(mapRef, fromLonLat([-52.4066, -26.876]), false, setCoordinates);
     }
-  }, []);
+  }, [setCoordinates]);
 
   return (
     <div className="w-full h-full border-pool-black border-2 rounded-2xl overflow-hidden">

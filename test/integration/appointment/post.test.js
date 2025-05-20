@@ -123,7 +123,7 @@ describe("POST to /api/v1/appointment", () => {
             complement: "",
           });
         });
-        test("Without complement", async () => {
+        test("Without reference", async () => {
           const appointment = {
             client_id: clientUser.id,
             professional_id: professionalUser.id,
@@ -362,7 +362,7 @@ describe("POST to /api/v1/appointment", () => {
               number: "2",
               complement: "Apartamento 1",
               reference: "Árvores",
-              longitude: -24.123456,
+              latitude: -24.123456,
               longitude: -24.123456,
             },
           };

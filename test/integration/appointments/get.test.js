@@ -3,7 +3,7 @@ import orchestrator from "test/orchestrator";
 let clientUser;
 let professionalUser;
 let clientSessionToken;
-let professionalSessionToken;
+let professionalSessionToken; // eslint-disable-line no-unused-vars
 
 const appointments = [];
 

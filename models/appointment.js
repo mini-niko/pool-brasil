@@ -182,9 +182,6 @@ function calculateAvaliableHours(date, scheduledHours) {
     for (let scheduledHour of scheduledHours) {
       const index = hoursList.indexOf(scheduledHour);
 
-      const finalIndex =
-        index - 4 >= scheduledHours.length ? scheduledHours.length : index - 4;
-
       hoursList.splice(index, 4);
     }
   }

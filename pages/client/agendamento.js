@@ -15,7 +15,7 @@ import NavigationBar from "@/interface/components/NavigationBar";
 import { ArrowLeft, PartyPopper } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { addHours, differenceInDays, format, set } from "date-fns";
+import { differenceInDays, format, set } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import Confetti from "react-confetti";
@@ -346,7 +346,7 @@ function StepTwo({ data, next, back }) {
         data.address.town?.toUpperCase() || data.address.city?.toUpperCase(),
       );
     })();
-  }, [coordinates]);
+  }, [setCity, setStreet, coordinates]);
 
   return (
     <>

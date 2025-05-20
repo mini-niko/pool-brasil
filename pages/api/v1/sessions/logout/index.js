@@ -1,6 +1,5 @@
 import controller from "@/models/controllers";
 import { createRouter } from "next-connect";
-import { UnauthorizedError } from "@/errors";
 import { serialize } from "cookie";
 import sessions from "@/models/sessions";
 

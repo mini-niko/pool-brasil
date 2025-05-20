@@ -316,12 +316,27 @@ async function getAllServices() {
   return response.rows;
 }
 
+async function updateAppointment(appointmentData) {
+  await database.query(
+    `
+    UPDATE
+      appointments
+    SET
+      status = $1
+    WHERE
+      appointments.id = $2
+    `,
+    [appointmentData.status, appointmentData.id],
+  );
+}
+
 const appointment = {
   createAppointment,
   getAllAppointmentsFromUserId,
   getAllProfessionals,
   getAllServices,
   getAvaliableHoursForProfessional,
+  updateAppointment,
 };
 
 const constraints = {

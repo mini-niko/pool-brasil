@@ -19,6 +19,8 @@ async function getHandler(req, res) {
 }
 
 async function postHandler(req, res) {
+  console.log(req.body);
+
   const user = await users.createUser(req.body);
 
   res.status(201).json(user);

@@ -44,7 +44,7 @@ import NavigationBar from "@/interface/components/NavigationBar";
 
 // React/Next
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Ícones
 import {
@@ -54,182 +54,26 @@ import {
   RefreshCw,
   Search,
 } from "lucide-react";
+import useSWR, { mutate } from "swr";
+import { fetcher } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { SelectValue } from "@radix-ui/react-select";
 
 function Clients() {
-  const rawData = [
-    {
-      name: "José da Silva",
-      email: "jose.silva@gmail.com",
-      cpf: "12345678900",
-      birth_day: "1990-02-15T00:00:00Z",
-      created_at: "2025-04-10T19:23:00Z",
-      updated_at: "2025-04-10T19:23:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Rui Barbosa",
-        number: 102,
-        complement: "Apartamento 201",
-        reference: "Próximo ao mercado central",
-      },
-    },
-    {
-      name: "Maria Oliveira",
-      email: "maria.oliveira@yahoo.com",
-      cpf: "23456789011",
-      birth_day: "1987-07-23T00:00:00Z",
-      created_at: "2025-04-11T08:15:00Z",
-      updated_at: "2025-04-11T08:15:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Avenida Brasil",
-        number: 450,
-        complement: null,
-        reference: "Em frente à praça principal",
-      },
-    },
-    {
-      name: "Carlos Souza",
-      email: "carlos.souza@hotmail.com",
-      cpf: "34567890122",
-      birth_day: "1992-11-09T00:00:00Z",
-      created_at: "2025-04-12T14:42:00Z",
-      updated_at: "2025-04-12T14:42:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Anita Garibaldi",
-        number: 230,
-        complement: "Casa",
-        reference: "Perto da escola estadual",
-      },
-    },
-    {
-      name: "Ana Paula Costa",
-      email: "ana.paula@gmail.com",
-      cpf: "45678901233",
-      birth_day: "1995-03-01T00:00:00Z",
-      created_at: "2025-04-13T16:30:00Z",
-      updated_at: "2025-04-13T16:30:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Victor Konder",
-        number: 89,
-        complement: null,
-        reference: "Ao lado da farmácia São João",
-      },
-    },
-    {
-      name: "Fernando Lima",
-      email: "fernando.lima@outlook.com",
-      cpf: "56789012344",
-      birth_day: "1989-05-17T00:00:00Z",
-      created_at: "2025-04-13T10:05:00Z",
-      updated_at: "2025-04-13T10:05:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Olavo Bilac",
-        number: 152,
-        complement: "Fundos",
-        reference: "Atrás da padaria Pão Quente",
-      },
-    },
-    {
-      name: "Juliana Martins",
-      email: "juliana.martins@gmail.com",
-      cpf: "67890123455",
-      birth_day: "1993-08-29T00:00:00Z",
-      created_at: "2025-04-14T09:20:00Z",
-      updated_at: "2025-04-14T09:20:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Rui Barbosa",
-        number: 118,
-        complement: "Sala 3",
-        reference: "Próximo ao shopping center",
-      },
-    },
-    {
-      name: "Rafael Pereira",
-      email: "rafael.pereira@uol.com.br",
-      cpf: "78901234566",
-      birth_day: "1991-12-10T00:00:00Z",
-      created_at: "2025-04-14T18:00:00Z",
-      updated_at: "2025-04-14T18:00:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Anita Garibaldi",
-        number: 320,
-        complement: null,
-        reference: "Atrás da academia Fitness Plus",
-      },
-    },
-    {
-      name: "Larissa Fernandes",
-      email: "larissa.fernandes@gmail.com",
-      cpf: "89012345677",
-      birth_day: "1996-04-06T00:00:00Z",
-      created_at: "2025-04-15T11:47:00Z",
-      updated_at: "2025-04-15T11:47:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Victor Konder",
-        number: 75,
-        complement: "Cobertura",
-        reference: "Em cima da pizzaria Don Juan",
-      },
-    },
-    {
-      name: "Bruno Rocha",
-      email: "bruno.rocha@icloud.com",
-      cpf: "90123456788",
-      birth_day: "1990-06-18T00:00:00Z",
-      created_at: "2025-04-15T15:35:00Z",
-      updated_at: "2025-04-15T15:35:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Avenida Brasil",
-        number: 580,
-        complement: "Loja 2",
-        reference: "Ao lado da loja Americanas",
-      },
-    },
-    {
-      name: "Camila Ribeiro",
-      email: "camila.ribeiro@gmail.com",
-      cpf: "01234567899",
-      birth_day: "1994-01-22T00:00:00Z",
-      created_at: "2025-04-16T13:12:00Z",
-      updated_at: "2025-04-16T13:12:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Olavo Bilac",
-        number: 240,
-        complement: null,
-        reference: "Em frente ao colégio São Francisco",
-      },
-    },
-  ];
+  const { data: rawData } = useSWR("/api/v1/users", fetcher);
 
   const [data, setData] = useState(rawData);
+
+  useEffect(() => {
+    setData(rawData);
+  }, [rawData]);
 
   return (
     <>
@@ -241,7 +85,12 @@ function Clients() {
         </div>
         <div className="gap-4 flex flex-col-reverse md:flex-row items-center justify-between w-full md:w-3/4">
           <SearchItems rawData={rawData} setData={setData} />
-          <CreateAccount />
+
+          <CreateAccountDialog>
+            <Button className="w-fit" variant="outline">
+              <CirclePlus className="h-8, w-8" /> Criar nova conta
+            </Button>
+          </CreateAccountDialog>
         </div>
         <ClientsTable data={data} />
         <Link className="underline text-pool-black" href="/admin">
@@ -325,22 +174,35 @@ function FilterOptions({ children, filterKey, setFilterKey }) {
   );
 }
 
-function CreateAccount() {
-  return (
-    <CreateAccountDialog>
-      <Button className="w-fit" variant="outline">
-        <CirclePlus className="h-8, w-8" /> Criar nova conta
-      </Button>
-    </CreateAccountDialog>
-  );
-}
-
 function CreateAccountDialog({ children }) {
+  const [name, setName] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [feature, setFeature] = useState("client");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [birthDay, setBirthDay] = useState("");
+
+  const [state, setState] = useState("");
+  const [city, setCity] = useState("");
+  const [street, setStreet] = useState("");
+  const [number, setNumber] = useState("");
+  const [complement, setComplement] = useState("");
+  const [reference, setReference] = useState("");
+
+  const features = {
+    client: "Cliente",
+    professional: "Profissional",
+    Admin: "Administrador",
+  };
+
   const pages = [
     <div key="page-1" className="flex flex-col">
       <div className="flex flex-col gap-2 my-2">
         <Label htmlFor="name">Nome</Label>
         <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="w-2/3 disabled:opacity-100 disabled:cursor-default"
           id="name"
         />
@@ -348,6 +210,8 @@ function CreateAccountDialog({ children }) {
       <div className="flex flex-col gap-2 my-2">
         <Label htmlFor="cpf">CPF</Label>
         <Input
+          value={cpf}
+          onChange={(e) => setCpf(e.target.value)}
           className="w-1/2 disabled:opacity-100 disabled:cursor-default"
           id="cpf"
         />
@@ -355,6 +219,8 @@ function CreateAccountDialog({ children }) {
       <div className="flex flex-col gap-2 my-2">
         <Label htmlFor="email">Email</Label>
         <Input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-2/3 disabled:opacity-100 disabled:cursor-default"
           id="email"
         />
@@ -362,6 +228,8 @@ function CreateAccountDialog({ children }) {
       <div className="flex flex-col gap-2 my-2">
         <Label htmlFor="birthday">Data de nascimento</Label>
         <Input
+          value={birthDay}
+          onChange={(e) => setBirthDay(e.target.value)}
           className="w-fit disabled:opacity-100 disabled:cursor-default"
           id="birthday"
           type="date"
@@ -374,6 +242,8 @@ function CreateAccountDialog({ children }) {
         <div className="flex w-5/6 flex-col gap-2 my-2">
           <Label htmlFor="street">Rua</Label>
           <Input
+            value={street}
+            onChange={(e) => setStreet(e.target.value)}
             className="w-full disabled:opacity-100 disabled:cursor-default"
             id="street"
           />
@@ -381,6 +251,8 @@ function CreateAccountDialog({ children }) {
         <div className="flex w-1/6 flex-col gap-2 my-2">
           <Label htmlFor="number">Número</Label>
           <Input
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
             className="w-full disabled:opacity-100 disabled:cursor-default"
             id="number"
           />
@@ -390,6 +262,8 @@ function CreateAccountDialog({ children }) {
         <div className="flex w-1/2 flex-col gap-2 my-2">
           <Label htmlFor="complement">Complemento</Label>
           <Input
+            value={complement}
+            onChange={(e) => setComplement(e.target.value)}
             className="w-full disabled:opacity-100 disabled:cursor-default"
             id="complement"
           />
@@ -397,24 +271,31 @@ function CreateAccountDialog({ children }) {
         <div className="flex w-1/2 flex-col gap-2 my-2">
           <Label htmlFor="reference">Referência</Label>
           <Input
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
             className="w-full disabled:opacity-100 disabled:cursor-default"
             id="reference"
           />
         </div>
       </div>
       <div className="flex gap-4">
-        <div className="flex w-1/6 flex-col gap-2 my-2">
-          <Label htmlFor="state">Estado</Label>
+        <div className="flex w-2/6 flex-col gap-2 my-2">
+          <Label htmlFor="state">Estado (UF)</Label>
           <Input
+            value={state}
+            maxLength={2}
+            onChange={(e) => setState(e.target.value)}
             className="w-full disabled:opacity-100 disabled:cursor-default"
             id="state"
           />
         </div>
         <div className="flex w-1/2 flex-col gap-2 my-2">
-          <Label htmlFor="cities">Cidade</Label>
+          <Label htmlFor="city">Cidade</Label>
           <Input
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
             className="w-full disabled:opacity-100 disabled:cursor-default"
-            id="cities"
+            id="city"
           />
         </div>
       </div>
@@ -422,17 +303,44 @@ function CreateAccountDialog({ children }) {
 
     <div key="page-3" className="flex flex-col">
       <div className="flex w-2/3 flex-col gap-2 my-2">
+        <Label htmlFor="password">Tipo</Label>
+        <Select value={feature} onValueChange={(value) => setFeature(value)}>
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {
+              <SelectGroup>
+                {Object.entries(features).map(([key, value]) => {
+                  return (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            }
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex w-2/3 flex-col gap-2 my-2">
         <Label htmlFor="password">Senha</Label>
         <Input
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          type="password"
           className="w-full disabled:opacity-100 disabled:cursor-default"
           id="password"
         />
       </div>
       <div className="flex w-2/3 flex-col gap-2 my-2">
-        <Label htmlFor="password">Confirmar senha</Label>
+        <Label htmlFor="confirmPassword">Confirmar senha</Label>
         <Input
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          type="password"
           className="w-full disabled:opacity-100 disabled:cursor-default"
-          id="password"
+          id="confirmPassword"
         />
       </div>
     </div>,
@@ -440,15 +348,40 @@ function CreateAccountDialog({ children }) {
 
   const [numberPage, setNumberPage] = useState(0);
 
-  function onClickConfirm(e) {
+  async function onClickConfirm(e) {
     if (numberPage < pages.length - 1) {
       e.preventDefault();
       setNumberPage(numberPage + 1);
     } else {
-      setTimeout(() => {
-        setNumberPage(0);
-      }, 150);
-      //post na api
+      const user = {
+        name,
+        cpf,
+        email,
+        password,
+        features: [feature],
+        confirm_password: confirmPassword,
+        birth_day: birthDay,
+        address: {
+          state,
+          city,
+          street,
+          number,
+          complement,
+          reference,
+        },
+      };
+
+      const response = await fetch("/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (response.status === 201) {
+        mutate("/api/v1/users");
+      }
     }
   }
 
@@ -501,23 +434,24 @@ function ClientsTable({ data }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((user) => {
-          return (
-            <TableRow key={user.id} className="justify-center">
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.cpf}</TableCell>
-              <TableCell className="hidden md:table-cell">
-                {user.email}
-              </TableCell>
-              <TableCell className="hidden md:table-cell">
-                {new Date(user.birth_day).toLocaleDateString("pt-BR")}
-              </TableCell>
-              <TableCell>
-                <UserOptions data={user} />
-              </TableCell>
-            </TableRow>
-          );
-        })}
+        {data &&
+          data?.map((user) => {
+            return (
+              <TableRow key={user.id} className="justify-center">
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.cpf}</TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {user.email}
+                </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {new Date(user.birth_day).toLocaleDateString("pt-BR")}
+                </TableCell>
+                <TableCell>
+                  <UserOptions data={user} />
+                </TableCell>
+              </TableRow>
+            );
+          })}
       </TableBody>
     </Table>
   );
@@ -568,33 +502,33 @@ function UserDetails({ data }) {
           <TabsContent value="account">
             <div className="flex flex-col w-full">
               <div className="flex gap-4 my-2 w-full">
-                <Label htmlFor="name" className="w-1/3 justify-end">
+                <Label htmlFor="name" className="w-1/4 justify-end">
                   Nome
                 </Label>
                 <Input
-                  className="w-2/3 disabled:opacity-100 disabled:cursor-default"
+                  className="w-3/4 disabled:opacity-100 disabled:cursor-default"
                   id="name"
                   disabled
                   value={data.name}
                 />
               </div>
               <div className="flex gap-4 my-2 w-full">
-                <Label htmlFor="cpf" className="w-1/3 justify-end">
+                <Label htmlFor="cpf" className="w-1/4 justify-end">
                   CPF
                 </Label>
                 <Input
-                  className="w-2/3 disabled:opacity-100 disabled:cursor-default"
+                  className="w-3/4 disabled:opacity-100 disabled:cursor-default"
                   id="cpf"
                   disabled
                   value={data.cpf}
                 />
               </div>
               <div className="flex gap-4 my-2 w-full">
-                <Label htmlFor="email" className="w-1/3 justify-end">
+                <Label htmlFor="email" className="w-1/12 justify-end">
                   Email
                 </Label>
                 <Input
-                  className="w-2/3 disabled:opacity-100 disabled:cursor-default"
+                  className="w-11/12 disabled:opacity-100 disabled:cursor-default"
                   id="email"
                   disabled
                   value={data.email}
@@ -603,11 +537,11 @@ function UserDetails({ data }) {
               <div className="flex gap-4 my-2 w-full">
                 <Label
                   htmlFor="birthday"
-                  className="w-1/3 justify-end text-end"
+                  className="w-1/4 justify-end text-end"
                 >
                   Data de nascimento
                 </Label>
-                <div className="w-2/3">
+                <div className="w-3/4">
                   <Input
                     className="w-fit disabled:opacity-100 disabled:cursor-default"
                     id="birthday"
@@ -630,7 +564,7 @@ function UserDetails({ data }) {
                   <Label className="w-1/3 justify-end" htmlFor="street">
                     Rua
                   </Label>
-                  <Input
+                  <Textarea
                     className="w-2/3 disabled:opacity-100 disabled:cursor-default"
                     id="street"
                     disabled
@@ -657,7 +591,7 @@ function UserDetails({ data }) {
                     Complemento
                   </Label>
                   <div className="w-2/3">
-                    <Input
+                    <Textarea
                       className="md:w-2/3 disabled:opacity-100 disabled:cursor-default"
                       id="complement"
                       disabled
@@ -668,7 +602,7 @@ function UserDetails({ data }) {
 
                 <div className="flex flex-row gap-4 my-2">
                   <Label className="w-1/3 justify-end" htmlFor="state">
-                    Estado
+                    Estado (UF)
                   </Label>
                   <div className="w-2/3">
                     <Input
@@ -786,7 +720,7 @@ function UserUpdate() {
               <div className="flex flex-col gap-2 my-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
-                  className="w-2/3 disabled:opacity-100 disabled:cursor-default"
+                  className="w-3/3 disabled:opacity-100 disabled:cursor-default"
                   id="email"
                 />
               </div>
@@ -836,7 +770,7 @@ function UserUpdate() {
               </div>
               <div className="flex gap-4">
                 <div className="flex w-1/6 flex-col gap-2 my-2">
-                  <Label htmlFor="state">Estado</Label>
+                  <Label htmlFor="state">Estado (UF)</Label>
                   <Input
                     className="w-full disabled:opacity-100 disabled:cursor-default"
                     id="state"

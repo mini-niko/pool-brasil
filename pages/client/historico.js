@@ -44,7 +44,12 @@ function Historico() {
 }
 
 function CustomTable() {
-  const { data } = useSWR(`/api/v1/appointment`, fetcher);
+  const { data } = useSWR(`/api/v1/appointment`, fetcher, {
+    refreshInterval: 30000,
+    refreshWhenHidden: true,
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+  });
 
   return (
     <Table className="">

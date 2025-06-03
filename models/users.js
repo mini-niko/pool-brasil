@@ -2,7 +2,7 @@ import database from "infra/database";
 import userValidation from "./validation/user";
 import { cpf } from "cpf-cnpj-validator";
 import authentication from "models/authentication.js";
-import { NotFoundError } from "errors";
+import { NotFoundError, ValidationError } from "errors";
 
 async function createUser(userData = {}) {
   userData.cpf = cpf.format(userData.cpf).replaceAll(".", "").replace("-", "");
@@ -73,7 +73,6 @@ async function getUser(key, value) {
   const response = await database.query(
     `
     SELECT 
-      u.id as user_id,
       u.*, 
       a.*
     FROM 
@@ -101,7 +100,7 @@ async function getUserByLogin(email, password) {
       u.created_at,
       u.updated_at,
       a.*,
-      u.id
+      u.id as user_id
     FROM 
       users u
     LEFT JOIN
@@ -123,7 +122,7 @@ async function getAllUsers() {
   const response = await database.query(
     `
     SELECT
-      u.id,
+      u.id as user_id,
       u.name,
       u.cpf,
       u.email,
@@ -144,24 +143,56 @@ async function getAllUsers() {
   return response.rows.map((user) => formatUser(user));
 }
 
-async function updateUser(searchKey, searchValue, updateKey, updateValue) {
-  if (searchKey === "id") userValidation.validID(searchValue);
+async function updateUser(id, data) {
+  userValidation.validID(id);
+
+  if (Object.keys(data).length === 0)
+    throw new ValidationError({
+      message:
+        "Você precisa adicionar, no minímo, um campo para ser modificado.",
+      action: "Envie um campo para alterar.",
+      stack: new Error().stack,
+    });
+
+  let fieldsForQuery = Object.keys(data)
+    .map((val, i) => `${val} = $${i + 1}`)
+    .join(", ");
+  fieldsForQuery += ", updated_at = NOW()";
+
+  let valuesForQuery = Object.values(data);
+  valuesForQuery.push(id);
+
+  const idIndex = valuesForQuery.length;
 
   const response = await database.query(
     `
-    UPDATE 
+    UPDATE
       users
-    SET 
-      ${updateKey} = $1
-    WHERE 
-      ${searchKey} = $2
-    RETURNING 
+    SET
+      ${fieldsForQuery}
+    WHERE
+      id = $${idIndex}
+    RETURNING
       *
     ;`,
-    [updateValue, searchValue],
+    valuesForQuery,
   );
 
   return formatUser(response.rows[0]);
+}
+
+async function deleteUser(id) {
+  userValidation.validID(id);
+
+  await database.query(
+    `
+    DELETE FROM
+      users
+    WHERE
+      id = $1
+    ;`,
+    [id],
+  );
 }
 
 async function confirmAccount(token) {
@@ -235,10 +266,12 @@ function getBlankUser() {
 const users = {
   createUser,
   confirmAccount,
+  deleteUser,
   getAllUsers,
   getBlankUser,
   getUser,
   getUserByLogin,
+  updateUser,
 };
 
 export default users;

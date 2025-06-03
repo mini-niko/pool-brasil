@@ -1,16 +1,6 @@
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import DefaultContainer from "@/components/ui/defaultContainer";
 import Form from "@/components/ui/Form";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,92 +13,142 @@ import {
   SelectLabel,
 } from "@/components/ui/select";
 import {} from "@radix-ui/react-select";
+import { Controller, useForm } from "react-hook-form";
+import useSWR from "swr";
+import { fetcher } from "@/lib/utils";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import FormField from "@/components/ui/form-field";
+import { cpf as cpfValidator } from "cpf-cnpj-validator";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+
+const registerUserSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3, "Seu nome deve ter mais de 3 letras.")
+      .regex(
+        /^[A-Za-zÀ-ÿ]+(?:[-'\s][A-Za-zÀ-ÿ]+)*$/,
+        "Seu nome deve conter apenas letras e espaços.",
+      ),
+    cpf: z.string().refine((cpf) => cpfValidator.isValid(cpf), {
+      message: "Seu CPF deve ser válido.",
+    }),
+    email: z.string().email("Seu email deve ser válido."),
+    birth_day: z
+      .string()
+      .refine((val) => {
+        const date = new Date(val);
+        return !isNaN(date?.getTime());
+      }, "A data de nascimento é obrigatória")
+      .refine((val) => {
+        const today = new Date();
+        const minAge = new Date(
+          today.getFullYear() - 16,
+          today.getMonth(),
+          today.getDate(),
+        );
+        return new Date(val) <= minAge;
+      }, "Você deve ter, pelo menos, 16 anos."),
+    password: z.string().min(8, "Sua senha deve ter, no mínimo, 8 caracteres"),
+    confirm_password: z.string(),
+    address: z.object({
+      street: z
+        .string()
+        .nonempty("A sua rua deve ser inserida.")
+        .regex(/^[\p{L}0-9 ]+$/u, "A rua deve conter apenas letras e números.")
+        .min(8, "A rua deve conter, pelo menos, 8 letras."),
+      number: z.coerce
+        .number({
+          required_error: "O número é obrigatório",
+          invalid_type_error: "O numero deve ser válido",
+        })
+        .int("O número deve ser válido.")
+        .min(1, "O número deve ser válido.")
+        .max(999999, "O número deve ser válido."),
+      complement: z
+        .string()
+        .min(0, "Teste")
+        .max(40, "O complemento deve ser mais curto."),
+      reference: z
+        .string()
+        .min(0, "Teste")
+        .max(40, "A referência deve ser mais curta."),
+      state: z.string().min(1, "O estado é obrigatório."),
+      city: z.string().min(1, "A cidade é obrigatório."),
+    }),
+  })
+  .superRefine((val, ctx) => {
+    if (val.password !== val.confirm_password) {
+      ctx.addIssue({
+        path: ["confirm_password"],
+        code: z.ZodIssueCode.custom,
+        message: "As senhas precisam ser iguais",
+      });
+    }
+  });
 
 function Registro() {
+  return (
+    <DefaultContainer>
+      <RegisterForm></RegisterForm>
+    </DefaultContainer>
+  );
+}
+
+function RegisterForm() {
   const router = useRouter();
 
-  const [pageIndex, setPageIndex] = useState(0);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerUserSchema),
+    mode: "onBlur",
+  });
 
-  const [name, setName] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [email, setEmail] = useState("");
-  const [birthDay, setBirthDay] = useState("");
+  const state = watch("state");
 
-  const [street, setStreet] = useState("");
-  const [number, setNumber] = useState();
-  const [complement, setComplement] = useState("");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
-  const [reference, setReference] = useState("");
+  const { data: states } = useSWR(
+    "https://brasilapi.com.br/api/ibge/uf/v1",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
+    },
+  );
 
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { data: cities } = useSWR(
+    watch("address.state")
+      ? `https://brasilapi.com.br/api/ibge/municipios/v1/${watch("address.state")}`
+      : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
+    },
+  );
 
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
-
-  useEffect(() => {
-    async function fetchStates() {
-      const statesResponse = await fetch(
-        "https://brasilapi.com.br/api/ibge/uf/v1",
-      );
-
-      const statesBody = await statesResponse.json();
-
-      const statesArray = statesBody
-        .map((state) => {
-          return state.sigla;
-        })
-        .sort((a, b) => a.localeCompare(b));
-
-      setStates(statesArray);
-    }
-
-    fetchStates();
-  }, []);
-
-  useEffect(() => {
-    if (!state) return;
-    async function fetchCities() {
-      const citiesResponse = await fetch(
-        `https://brasilapi.com.br/api/ibge/municipios/v1/${state}`,
-      );
-
-      const citiesBody = await citiesResponse.json();
-
-      const citiesArray = citiesBody
-        .map((city) => {
-          return city.nome;
-        })
-        .sort((a, b) => a.localeCompare(b));
-
-      setCities(citiesArray);
-    }
-
-    fetchCities();
-  }, [state]);
-
-  async function onSubmit() {
-    const isoBirthDay = new Date(birthDay || 0).toISOString();
-
+  async function onSubmit(data) {
     const user = {
-      name,
-      cpf,
-      email,
-      password,
-      confirm_password: confirmPassword,
-      birth_day: isoBirthDay,
-      address: {
-        state,
-        city,
-        street,
-        number,
-        complement,
-        reference,
-      },
+      ...data,
+      birth_day: new Date(data.birth_day).toISOString(),
     };
 
-    const response = await fetch("/api/v1/users", {
+    const response = await fetch("/api/v1/user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -119,221 +159,196 @@ function Registro() {
     if (response.status == 201) router.push("/confirmar_conta");
   }
 
-  const pages = [
-    <>
-      <Card className="items-center z-20 relative">
-        <CardHeader className="w-[350px]">
-          <CardTitle>
-            <h1>Registro</h1>
-          </CardTitle>
-          <CardDescription>
-            <h2>Vamos iniciar seu registro?</h2>
-          </CardDescription>
-        </CardHeader>
-        <CardFooter className="flex-col gap-4">
-          <Button onClick={() => setPageIndex(1)}>Iniciar</Button>
-          <p className="text-sm">
-            <span>Já possui uma conta? </span>
-            <Link className="underline text-pool-black" href="/login">
-              Entrar agora
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
-    </>,
-    <>
-      <Form
-        title="Dados Pessoais"
-        subtitle="Preencha os campos abaixo com os seus dados para iniciar o cadastro."
-        buttonLabel={"Próximo"}
-        fields={[
-          <>
-            <Label htmlFor="name">Nome</Label>
-            <Input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Fulano da Silva"
-            />
-          </>,
-          <>
-            <Label htmlFor="cpf">CPF</Label>
-            <Input
-              id="cpf"
-              type="text"
-              value={cpf}
-              onChange={(e) => setCpf(e.target.value)}
-              placeholder="012.345.678-90"
-            />
-          </>,
-          <>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="exemplo@email.com"
-            />
-          </>,
-          <>
-            <Label htmlFor="birthday">Data de Nascimento</Label>
-            <Input
-              className="w-fit"
-              id="birthday"
-              type="date"
-              onChange={(e) => setBirthDay(e.target.value)}
-            />
-          </>,
-        ]}
-        onBack={() => setPageIndex(0)}
-        onClick={() => setPageIndex(2)}
-        footer={
-          <p className="text-sm">
-            <span>Já possui uma conta? </span>
-            <Link className="underline text-pool-black" href="/login">
-              Entrar agora
-            </Link>
-          </p>
-        }
-      />
-    </>,
-    <>
-      <Form
-        title="Endereço"
-        subtitle="Adicione o seu endereço para futuros serviços (endereço do local da
-          piscina)"
-        buttonLabel={"Próximo"}
-        fields={[
-          <>
-            <Label htmlFor="street">Rua</Label>
-            <Input
-              id="street"
-              type="text"
-              value={street}
-              onChange={(e) => setStreet(e.target.value)}
-              placeholder="Rua XYZ"
-            />
-          </>,
-          <>
-            <Label htmlFor="number">Número</Label>
-            <Input
-              id="number"
-              type="text"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
-              placeholder="0"
-            />
-          </>,
-          <>
-            <Label htmlFor="complement">Complemento (opcional)</Label>
-            <Input
-              id="complement"
-              type="text"
-              value={complement}
-              onChange={(e) => setComplement(e.target.value)}
-              placeholder="Apartamento 0"
-            />
-          </>,
-          <>
-            <Label htmlFor="state">Estado</Label>
-            <Select id="state" value={state} onValueChange={setState}>
-              <SelectTrigger className="w-full">
+  const steps = [
+    [
+      <FormField
+        key="name"
+        id="name"
+        label="Nome Completo"
+        placeholder="Fulano da Silva"
+        error={errors.name}
+        register={register}
+      />,
+      <FormField
+        key="cpf"
+        id="cpf"
+        label="CPF"
+        placeholder="012.345.678-90"
+        error={errors.cpf}
+        register={register}
+      />,
+      <FormField
+        key="email"
+        id="email"
+        label="Email"
+        placeholder="exemplo@email.com"
+        error={errors.email}
+        register={register}
+      />,
+      <FormField
+        className="w-fit"
+        id="birth_day"
+        type="date"
+        label="Data de nascimento"
+        error={errors.birth_day}
+        register={register}
+      />,
+    ],
+    [
+      <FormField
+        id="street"
+        prefix="address"
+        label="Rua"
+        error={errors.address?.street}
+        register={register}
+        placeholder="Rua dos Santos"
+      />,
+      <FormField
+        id="number"
+        prefix="address"
+        label="Número"
+        error={errors.address?.number}
+        register={register}
+        placeholder="1029"
+      />,
+      <FormField
+        id="complement"
+        prefix="address"
+        label="Complemento (opcional)"
+        error={errors.address?.complement}
+        register={register}
+        placeholder="Apartamento 101"
+      />,
+      <>
+        <Label htmlFor="state">Estado</Label>
+        <Controller
+          name="address.state"
+          control={control}
+          rules={{ required: "Estado é obrigatório" }}
+          defaultValue=""
+          render={({ field }) => (
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <SelectTrigger
+                className={
+                  "w-full" + (errors.address?.state ? ` border-red-400` : "")
+                }
+              >
                 <SelectValue placeholder="Selecione um estado" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Estados</SelectLabel>
-                  {states.map((sail) => {
-                    return (
-                      <SelectItem key={sail} value={sail}>
-                        {sail}
+                  {states &&
+                    states.map((sail) => (
+                      <SelectItem key={sail.id} value={sail.sigla}>
+                        {sail.sigla}
                       </SelectItem>
-                    );
-                  })}
+                    ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
-          </>,
-          <>
-            <Label htmlFor="city">Cidade</Label>
-            <Select id="city" value={city} onValueChange={setCity}>
-              <SelectTrigger className="w-full">
+          )}
+        />
+        {errors.address?.state && (
+          <p className="text-xs text-red-600">
+            {errors.address?.state.message}
+          </p>
+        )}
+      </>,
+      <>
+        <Label htmlFor="city">Cidade</Label>
+        <Controller
+          name="address.city"
+          control={control}
+          rules={{ required: "Estado é obrigatório" }}
+          defaultValue=""
+          render={({ field }) => (
+            <Select
+              id="city"
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+            >
+              <SelectTrigger
+                className={
+                  "w-full" + (errors.address?.city ? ` border-red-400` : "")
+                }
+              >
                 <SelectValue placeholder="Selecione uma cidade" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>Cidade</SelectLabel>
-                  {cities.map((name) => {
-                    return (
-                      <SelectItem key={name} value={name}>
-                        {name}
-                      </SelectItem>
-                    );
-                  })}
+                  <SelectLabel>Estados</SelectLabel>
+                  {cities &&
+                    cities.map((city) => {
+                      return (
+                        <SelectItem key={city.nome} value={city.nome}>
+                          {city.nome}
+                        </SelectItem>
+                      );
+                    })}
                 </SelectGroup>
               </SelectContent>
             </Select>
-          </>,
-          <>
-            <Label htmlFor="reference">Referência</Label>
-            <Input
-              id="reference"
-              type="text"
-              value={reference}
-              onChange={(e) => setReference(e.target.value)}
-              placeholder=""
-            />
-          </>,
-        ]}
-        onBack={() => setPageIndex(1)}
-        onClick={() => setPageIndex(3)}
-        footer={
-          <p className="text-sm">
-            <span>Já possui uma conta? </span>
-            <Link className="underline text-pool-black" href="/login">
-              Entrar agora
-            </Link>
-          </p>
-        }
-      />
-    </>,
-    <>
-      <Form
-        title="Senha"
-        subtitle="
-          Crie a sua nova senha."
-        buttonLabel="Próximo"
-        fields={[
-          <>
-            <Label htmlFor="password">Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Digite sua senha"
-            />
-          </>,
-          <>
-            <Label htmlFor="confirmPassword">Repita a senha</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Repita sua senha"
-            />
-          </>,
-        ]}
-        onSubmit={(e) => e.preventDefault()}
-        onBack={() => setPageIndex(2)}
-        onClick={onSubmit}
-      ></Form>
-    </>,
+          )}
+        />
+        {errors.address?.city && (
+          <p className="text-xs text-red-600">{errors.address?.city.message}</p>
+        )}
+      </>,
+      <FormField
+        id="reference"
+        prefix="address"
+        label="Referência (opcional)"
+        error={errors.address?.reference}
+        register={register}
+        placeholder="Ao lado da loja XYZ"
+      />,
+    ],
+    [
+      <FormField
+        id="password"
+        label="Senha"
+        type="password"
+        error={errors.password}
+        register={register}
+      />,
+      <FormField
+        id="confirm_password"
+        label="Senha"
+        type="password"
+        error={errors.confirm_password}
+        register={register}
+      />,
+    ],
   ];
 
-  return <DefaultContainer>{pages[pageIndex]}</DefaultContainer>;
+  const Footer = () => (
+    <p className="w-full text-sm text-center">
+      <span>Já possui uma conta? </span>
+      <Link className="underline text-pool-black" href="/login">
+        Entrar agora
+      </Link>
+    </p>
+  );
+
+  return (
+    <Card className="z-20 relative">
+      <CardHeader className="w-[350px]">
+        <CardTitle>
+          <h1>Cadastro</h1>
+        </CardTitle>
+        <CardDescription>
+          <h2>Preencha os dados abaixo para se cadastrar.</h2>
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form steps={steps} error={errors} onSubmit={handleSubmit(onSubmit)} />
+      </CardContent>
+      <CardFooter>
+        <Footer />
+      </CardFooter>
+    </Card>
+  );
 }
 
 export default Registro;

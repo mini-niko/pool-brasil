@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import {
   createContext,
   useContext,
@@ -13,19 +14,13 @@ export const UserProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUser = useCallback(async () => {
-    setIsLoading(true);
-
-    const request = await fetch("/api/v1/sessions");
+    const request = await fetch(`/api/v1/sessions`);
 
     if (request.status === 200) {
       const user = await request.json();
       setUser(user);
-    } else {
-      await fetch("/api/v1/sessions/logout");
     }
-
-    setIsLoading(false);
-  }, []);
+  }, [user]);
 
   const userContextValue = {
     user,
@@ -34,8 +29,14 @@ export const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!user) fetchUser();
-  }, [user, fetchUser]);
+    (async () => {
+      if (isLoading) {
+        await fetchUser();
+
+        setIsLoading(false);
+      }
+    })();
+  }, [isLoading]);
 
   return (
     <UserContext.Provider value={userContextValue}>

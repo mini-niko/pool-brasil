@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import {
   createContext,
   useContext,
@@ -20,7 +19,7 @@ export const UserProvider = ({ children }) => {
       const user = await request.json();
       setUser(user);
     }
-  }, [user]);
+  }, []);
 
   const userContextValue = {
     user,
@@ -36,7 +35,7 @@ export const UserProvider = ({ children }) => {
         setIsLoading(false);
       }
     })();
-  }, [isLoading]);
+  }, [fetchUser, isLoading]);
 
   return (
     <UserContext.Provider value={userContextValue}>

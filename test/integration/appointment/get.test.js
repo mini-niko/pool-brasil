@@ -52,7 +52,7 @@ describe("POST to /api/v1/appointment", () => {
 
       expect(response.status).toBe(200);
 
-      const body = await response.json();
+      // const body = await response.json();
     });
   });
 });

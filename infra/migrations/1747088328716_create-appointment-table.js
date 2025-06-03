@@ -119,6 +119,11 @@ exports.up = (pgm) => {
       primaryKey: ["appointment_id", "service_id"],
     },
   );
+
+  pgm.sql(`
+    INSERT INTO services (type)
+    VALUES ('Limpeza');
+  `);
 };
 
 /**

@@ -204,7 +204,7 @@ async function confirmAccount(token) {
       action: "Send an valid confirm token or request a new confirmation.",
     });
 
-  const user = await updateUser("id", userId, "features", ["client"]);
+  const user = await updateUser(userId, { features: ["client"] });
 
   if (!user)
     throw new NotFoundError({

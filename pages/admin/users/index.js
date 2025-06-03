@@ -7,8 +7,6 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -417,6 +415,7 @@ function CreateAccountDialog({ children }) {
         register={register}
       />,
       <FormField
+        key="birth_day"
         className="w-fit"
         id="birth_day"
         type="date"
@@ -427,6 +426,7 @@ function CreateAccountDialog({ children }) {
     ],
     [
       <FormField
+        key="street"
         id="street"
         prefix="address"
         label="Rua"
@@ -435,6 +435,7 @@ function CreateAccountDialog({ children }) {
         placeholder="Rua dos Santos"
       />,
       <FormField
+        key="number"
         id="number"
         prefix="address"
         label="Número"
@@ -443,6 +444,7 @@ function CreateAccountDialog({ children }) {
         placeholder="1029"
       />,
       <FormField
+        key="complement"
         id="complement"
         prefix="address"
         label="Complemento (opcional)"
@@ -450,87 +452,93 @@ function CreateAccountDialog({ children }) {
         register={register}
         placeholder="Apartamento 101"
       />,
-      <div className="flex gap-4">
-        <div className="flex flex-col gap-1 w-32">
-          <Label htmlFor="state">Estado</Label>
-          <Controller
-            name="address.state"
-            control={control}
-            rules={{ required: "Estado é obrigatório" }}
-            defaultValue=""
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger
-                  className={
-                    "w-full" + (errors.address?.state ? ` border-red-400` : "")
-                  }
+      <>
+        {/* Estado e cidade */}
+        <div key="location" className="flex gap-4">
+          <div className="flex flex-col gap-1 w-32">
+            <Label htmlFor="state">Estado</Label>
+            <Controller
+              name="address.state"
+              control={control}
+              rules={{ required: "Estado é obrigatório" }}
+              defaultValue=""
+              render={({ field }) => (
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
                 >
-                  <SelectValue placeholder="" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Estados</SelectLabel>
-                    {states &&
-                      states.map((sail) => (
-                        <SelectItem key={sail.id} value={sail.sigla}>
-                          {sail.sigla}
-                        </SelectItem>
-                      ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                  <SelectTrigger
+                    className={
+                      "w-full" +
+                      (errors.address?.state ? ` border-red-400` : "")
+                    }
+                  >
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Estados</SelectLabel>
+                      {states &&
+                        states.map((sail) => (
+                          <SelectItem key={sail.id} value={sail.sigla}>
+                            {sail.sigla}
+                          </SelectItem>
+                        ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.address?.state && (
+              <p className="text-xs text-red-600">
+                {errors.address?.state.message}
+              </p>
             )}
-          />
-          {errors.address?.state && (
-            <p className="text-xs text-red-600">
-              {errors.address?.state.message}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col gap-1 w-full">
-          <Label htmlFor="city">Cidade</Label>
-          <Controller
-            name="address.city"
-            control={control}
-            rules={{ required: "Estado é obrigatório" }}
-            defaultValue=""
-            render={({ field }) => (
-              <Select
-                id="city"
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <SelectTrigger
-                  className={
-                    "w-full" + (errors.address?.city ? ` border-red-400` : "")
-                  }
+          </div>
+          <div className="flex flex-col gap-1 w-full">
+            <Label htmlFor="city">Cidade</Label>
+            <Controller
+              name="address.city"
+              control={control}
+              rules={{ required: "Cidade é obrigatória" }}
+              defaultValue=""
+              render={({ field }) => (
+                <Select
+                  id="city"
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
                 >
-                  <SelectValue placeholder="" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Estados</SelectLabel>
-                    {cities &&
-                      cities.map((city) => {
-                        return (
+                  <SelectTrigger
+                    className={
+                      "w-full" + (errors.address?.city ? ` border-red-400` : "")
+                    }
+                  >
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Cidades</SelectLabel>
+                      {cities &&
+                        cities.map((city) => (
                           <SelectItem key={city.nome} value={city.nome}>
                             {city.nome}
                           </SelectItem>
-                        );
-                      })}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                        ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.address?.city && (
+              <p className="text-xs text-red-600">
+                {errors.address?.city.message}
+              </p>
             )}
-          />
-          {errors.address?.city && (
-            <p className="text-xs text-red-600">
-              {errors.address?.city.message}
-            </p>
-          )}
+          </div>
         </div>
-      </div>,
+      </>,
       <FormField
+        key="reference"
         id="reference"
         prefix="address"
         label="Referência (opcional)"
@@ -540,45 +548,46 @@ function CreateAccountDialog({ children }) {
       />,
     ],
     [
-      <div className="flex flex-col gap-1 w-full">
-        <Label htmlFor="features">Tipo</Label>
-        <Controller
-          name="features"
-          control={control}
-          rules={{ required: "O Tipo é obrigatório" }}
-          defaultValue=""
-          render={({ field }) => (
-            <Select
-              id="feature"
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
-              <SelectTrigger
-                className={
-                  "w-full" + (errors.features ? ` border-red-400` : "")
-                }
+      <>
+        <div key="features" className="flex flex-col gap-1 w-full">
+          <Label htmlFor="features">Tipo</Label>
+          <Controller
+            name="features"
+            control={control}
+            rules={{ required: "O Tipo é obrigatório" }}
+            defaultValue=""
+            render={({ field }) => (
+              <Select
+                id="feature"
+                onValueChange={field.onChange}
+                defaultValue={field.value}
               >
-                <SelectValue placeholder="" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {Object.entries(features).map(([key, value]) => {
-                    return (
+                <SelectTrigger
+                  className={
+                    "w-full" + (errors.features ? ` border-red-400` : "")
+                  }
+                >
+                  <SelectValue placeholder="" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {Object.entries(features).map(([key, value]) => (
                       <SelectItem key={key} value={key}>
                         {value}
                       </SelectItem>
-                    );
-                  })}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.features && (
+            <p className="text-xs text-red-600">{errors.features.message}</p>
           )}
-        />
-        {errors.address?.city && (
-          <p className="text-xs text-red-600">{errors.features?.message}</p>
-        )}
-      </div>,
+        </div>
+      </>,
       <FormField
+        key="password"
         id="password"
         label="Senha"
         type="password"
@@ -586,6 +595,7 @@ function CreateAccountDialog({ children }) {
         register={register}
       />,
       <FormField
+        key="confirm_password"
         id="confirm_password"
         label="Senha"
         type="password"
@@ -979,6 +989,7 @@ function UserUpdate({ id }) {
         register={register}
       />,
       <FormField
+        key="birth_day"
         className="w-fit"
         id="birth_day"
         type="date"
@@ -989,6 +1000,7 @@ function UserUpdate({ id }) {
     ],
     [
       <FormField
+        key="street"
         id="street"
         prefix="address"
         label="Rua"
@@ -997,6 +1009,7 @@ function UserUpdate({ id }) {
         placeholder="Rua dos Santos"
       />,
       <FormField
+        key="number"
         id="number"
         prefix="address"
         label="Número"
@@ -1005,6 +1018,7 @@ function UserUpdate({ id }) {
         placeholder="1029"
       />,
       <FormField
+        key="complement"
         id="complement"
         prefix="address"
         label="Complemento (opcional)"
@@ -1012,8 +1026,8 @@ function UserUpdate({ id }) {
         register={register}
         placeholder="Apartamento 101"
       />,
-      <div className="flex gap-4">
-        <div className="flex flex-col gap-1 w-32">
+      <div key="state-city-row" className="flex gap-4">
+        <div key="state" className="flex flex-col gap-1 w-32">
           <Label htmlFor="state">Estado</Label>
           <Controller
             name="address.state"
@@ -1049,12 +1063,12 @@ function UserUpdate({ id }) {
             </p>
           )}
         </div>
-        <div className="flex flex-col gap-1 w-full">
+        <div key="city" className="flex flex-col gap-1 w-full">
           <Label htmlFor="city">Cidade</Label>
           <Controller
             name="address.city"
             control={control}
-            rules={{ required: "Estado é obrigatório" }}
+            rules={{ required: "Cidade é obrigatória" }}
             defaultValue=""
             render={({ field }) => (
               <Select
@@ -1071,15 +1085,13 @@ function UserUpdate({ id }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectLabel>Estados</SelectLabel>
+                    <SelectLabel>Cidades</SelectLabel>
                     {cities &&
-                      cities.map((city) => {
-                        return (
-                          <SelectItem key={city.nome} value={city.nome}>
-                            {city.nome}
-                          </SelectItem>
-                        );
-                      })}
+                      cities.map((city) => (
+                        <SelectItem key={city.nome} value={city.nome}>
+                          {city.nome}
+                        </SelectItem>
+                      ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -1093,6 +1105,7 @@ function UserUpdate({ id }) {
         </div>
       </div>,
       <FormField
+        key="reference"
         id="reference"
         prefix="address"
         label="Referência (opcional)"
@@ -1102,7 +1115,7 @@ function UserUpdate({ id }) {
       />,
     ],
     [
-      <div className="flex flex-col gap-1 w-full">
+      <div key="features" className="flex flex-col gap-1 w-full">
         <Label htmlFor="features">Tipo</Label>
         <Controller
           name="features"
@@ -1124,23 +1137,22 @@ function UserUpdate({ id }) {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {Object.entries(features).map(([key, value]) => {
-                    return (
-                      <SelectItem key={key} value={key}>
-                        {value}
-                      </SelectItem>
-                    );
-                  })}
+                  {Object.entries(features).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
           )}
         />
-        {errors.address?.city && (
-          <p className="text-xs text-red-600">{errors.features?.message}</p>
+        {errors.features && (
+          <p className="text-xs text-red-600">{errors.features.message}</p>
         )}
       </div>,
       <FormField
+        key="password"
         id="password"
         label="Senha"
         type="password"

@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import DefaultContainer from "@/components/ui/defaultContainer";
 import Form from "@/components/ui/Form";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -29,6 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { Fragment } from "react";
 
 const registerUserSchema = z
   .object({
@@ -118,8 +118,6 @@ function RegisterForm() {
     mode: "onBlur",
   });
 
-  const state = watch("state");
-
   const { data: states } = useSWR(
     "https://brasilapi.com.br/api/ibge/uf/v1",
     fetcher,
@@ -186,6 +184,7 @@ function RegisterForm() {
         register={register}
       />,
       <FormField
+        key="birth_day"
         className="w-fit"
         id="birth_day"
         type="date"
@@ -196,6 +195,7 @@ function RegisterForm() {
     ],
     [
       <FormField
+        key="street"
         id="street"
         prefix="address"
         label="Rua"
@@ -204,6 +204,7 @@ function RegisterForm() {
         placeholder="Rua dos Santos"
       />,
       <FormField
+        key="number"
         id="number"
         prefix="address"
         label="Número"
@@ -212,6 +213,7 @@ function RegisterForm() {
         placeholder="1029"
       />,
       <FormField
+        key="complement"
         id="complement"
         prefix="address"
         label="Complemento (opcional)"
@@ -219,7 +221,7 @@ function RegisterForm() {
         register={register}
         placeholder="Apartamento 101"
       />,
-      <>
+      <Fragment key="state">
         <Label htmlFor="state">Estado</Label>
         <Controller
           name="address.state"
@@ -254,8 +256,8 @@ function RegisterForm() {
             {errors.address?.state.message}
           </p>
         )}
-      </>,
-      <>
+      </Fragment>,
+      <Fragment key="city">
         <Label htmlFor="city">Cidade</Label>
         <Controller
           name="address.city"
@@ -279,13 +281,11 @@ function RegisterForm() {
                 <SelectGroup>
                   <SelectLabel>Estados</SelectLabel>
                   {cities &&
-                    cities.map((city) => {
-                      return (
-                        <SelectItem key={city.nome} value={city.nome}>
-                          {city.nome}
-                        </SelectItem>
-                      );
-                    })}
+                    cities.map((city) => (
+                      <SelectItem key={city.nome} value={city.nome}>
+                        {city.nome}
+                      </SelectItem>
+                    ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -294,8 +294,9 @@ function RegisterForm() {
         {errors.address?.city && (
           <p className="text-xs text-red-600">{errors.address?.city.message}</p>
         )}
-      </>,
+      </Fragment>,
       <FormField
+        key="reference"
         id="reference"
         prefix="address"
         label="Referência (opcional)"
@@ -306,6 +307,7 @@ function RegisterForm() {
     ],
     [
       <FormField
+        key="password"
         id="password"
         label="Senha"
         type="password"
@@ -313,6 +315,7 @@ function RegisterForm() {
         register={register}
       />,
       <FormField
+        key="confirm_password"
         id="confirm_password"
         label="Senha"
         type="password"

@@ -38,6 +38,8 @@ describe("POST to /api/v1/appointment", () => {
     describe("Create new appointment", () => {
       describe("Valid data", () => {
         test("With all fields", async () => {
+          console.log(clientUser.id);
+
           const appointment = {
             client_id: clientUser.id,
             professional_id: professionalUser.id,

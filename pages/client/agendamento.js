@@ -236,7 +236,7 @@ function StepOne({ data, next, back }) {
           className="rounded-md shadow-lg"
           disabled={(date) =>
             date < new Date(new Date().setHours(0, 0, 0, 0)) ||
-            // date.getDay() === 0 ||
+            date.getDay() === 0 ||
             date.getDay() === 4 ||
             differenceInDays(date, Date.now()) < 2
           }
@@ -574,7 +574,7 @@ function StepThree({ data, next, back, postAppointment }) {
             <span className="font-semibold text-pool-white h-fit">Valor</span>
           </div>
           <div className="px-4 py-2 w-full md:w-72 rounded-b-xl md:rounded-bl-none bg-pool-white shadow-xl shadow-pool-dark/20">
-            R$200,00
+            R$120,00
           </div>
         </div>
       </div>

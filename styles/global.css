@@ -130,3 +130,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+.my-custom-button {
+  top: 10px;
+  right: 10px;
+  position: absolute;
+}
+
+.my-custom-button button {
+  background: white;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}

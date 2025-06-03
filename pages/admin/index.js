@@ -1,16 +1,21 @@
 import { Button } from "@/components/ui/button";
 import Container from "@/interface/components/Container";
 import NavigationBar from "@/interface/components/NavigationBar";
+import useUser from "@/interface/hooks/useUser";
 import { CalendarClock, Users } from "lucide-react";
 import { useRouter } from "next/router";
 
 function Admin() {
+  const { user } = useUser();
+
+  const name = user ? user.name.split(" ")[0] : "";
+
   return (
     <>
       <NavigationBar />
       <Container>
         <div className="text-center text-pool-black">
-          <h1 className="font-bold text-2xl">OLÁ MAURÍCIO!</h1>
+          <h1 className="font-bold text-2xl">OLÁ {name}!</h1>
           <h2 className="text-lg ">O que irá fazer hoje?</h2>
         </div>
         <Options />

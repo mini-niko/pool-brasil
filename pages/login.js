@@ -2,10 +2,17 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Form from "@/components/ui/Form";
-import useUser from "interface/hooks/useUser";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import DefaultContainer from "@/components/ui/defaultContainer";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 function Login() {
   return (
@@ -16,8 +23,6 @@ function Login() {
 }
 
 function LoginForm() {
-  const { fetchUser } = useUser();
-
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,8 +44,7 @@ function LoginForm() {
     });
 
     if (status === 201) {
-      fetchUser();
-      router.replace("/");
+      router.replace("/client");
     }
   }
 
@@ -65,8 +69,8 @@ function LoginForm() {
     </>,
   ];
 
-  const footer = (
-    <p className="text-sm">
+  const Footer = () => (
+    <p className="w-full text-sm text-center">
       <span>Não possui uma conta? </span>
       <Link className="underline text-pool-black" href="/registro">
         Criar agora
@@ -75,14 +79,24 @@ function LoginForm() {
   );
 
   return (
-    <Form
-      title="Login"
-      subtitle="Preencha os campos para realizar o login"
-      fields={fields}
-      onClick={onSubmit}
-      buttonLabel={"Entrar"}
-      footer={footer}
-    />
+    <>
+      <Card className="z-20 relative">
+        <CardHeader className="w-[350px]">
+          <CardTitle>
+            <h1>Login</h1>
+          </CardTitle>
+          <CardDescription>
+            <h2>Insira suas credenciais para entrar.</h2>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form steps={[fields]} onSubmit={onSubmit} />
+        </CardContent>
+        <CardFooter>
+          <Footer />
+        </CardFooter>
+      </Card>
+    </>
   );
 }
 

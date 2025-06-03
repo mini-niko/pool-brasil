@@ -41,6 +41,10 @@ async function getValueWithToken(prefix, token) {
   return value;
 }
 
+async function deleteValueWithToken(prefix, token) {
+  await redis.del(`${prefix}:${token}`);
+}
+
 async function sendEmailToConfirmAccount(emailAdress, token) {
   const body = <EmailComponent token={token} />;
 
@@ -53,6 +57,7 @@ const authentication = {
   injectUser,
   saveValueWithToken,
   sendEmailToConfirmAccount,
+  deleteValueWithToken,
 };
 
 export default authentication;

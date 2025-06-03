@@ -13,15 +13,12 @@ export const UserProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUser = useCallback(async () => {
-    setIsLoading(true);
-    const request = await fetch("/api/v1/sessions");
+    const request = await fetch(`/api/v1/sessions`);
 
     if (request.status === 200) {
       const user = await request.json();
       setUser(user);
     }
-
-    setIsLoading(false);
   }, []);
 
   const userContextValue = {
@@ -31,8 +28,14 @@ export const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!user) fetchUser();
-  }, [user, fetchUser]);
+    (async () => {
+      if (isLoading) {
+        await fetchUser();
+
+        setIsLoading(false);
+      }
+    })();
+  }, [fetchUser, isLoading]);
 
   return (
     <UserContext.Provider value={userContextValue}>

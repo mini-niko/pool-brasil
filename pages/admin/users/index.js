@@ -7,8 +7,6 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogDescription,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -44,7 +42,7 @@ import NavigationBar from "@/interface/components/NavigationBar";
 
 // React/Next
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Ícones
 import {
@@ -54,182 +52,174 @@ import {
   RefreshCw,
   Search,
 } from "lucide-react";
+import useSWR, { mutate } from "swr";
+import { fetcher } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { SelectValue } from "@radix-ui/react-select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Controller, useForm } from "react-hook-form";
+import FormField from "@/components/ui/form-field";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Form from "@/components/ui/Form";
+
+import { cpf as cpfValidator } from "cpf-cnpj-validator";
+import useUser from "@/interface/hooks/useUser";
+
+const adminCreateUserSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3, "O nome deve ter mais de 3 letras.")
+      .regex(
+        /^[A-Za-zÀ-ÿ]+(?:[-'\s][A-Za-zÀ-ÿ]+)*$/,
+        "O nome deve conter apenas letras e espaços.",
+      ),
+    cpf: z.string().refine((cpf) => cpfValidator.isValid(cpf), {
+      message: "O CPF deve ser válido.",
+    }),
+    email: z.string().email("O email deve ser válido."),
+    birth_day: z
+      .string()
+      .refine((val) => {
+        const date = new Date(val);
+        return !isNaN(date?.getTime());
+      }, "A data de nascimento é obrigatória")
+      .refine((val) => {
+        const today = new Date();
+        const minAge = new Date(
+          today.getFullYear() - 16,
+          today.getMonth(),
+          today.getDate(),
+        );
+        return new Date(val) <= minAge;
+      }, "O usuário deve ter, pelo menos, 16 anos."),
+    features: z.enum(["client", "professional", "admin"]),
+    password: z.string().min(8, "A senha deve ter, no mínimo, 8 caracteres"),
+    confirm_password: z.string(),
+    address: z.object({
+      street: z
+        .string()
+        .regex(/^[\p{L}0-9 ]+$/u, "A rua deve conter apenas letras e números.")
+        .min(8, "A rua deve conter, pelo menos, 8 letras."),
+      number: z.coerce
+        .number({
+          required_error: "O número é obrigatório",
+          invalid_type_error: "O numero deve ser válido",
+        })
+        .int("O número deve ser válido.")
+        .min(1, "O número deve ser válido.")
+        .max(999999, "O número deve ser válido."),
+      complement: z
+        .string()
+        .min(0)
+        .max(40, "O complemento deve ser mais curto."),
+      reference: z.string().min(0).max(40, "A referência deve ser mais curta."),
+      state: z.string().min(1, "O estado é obrigatório."),
+      city: z.string().min(1, "A cidade é obrigatório."),
+    }),
+  })
+  .superRefine((val, ctx) => {
+    if (val.password !== val.confirm_password) {
+      ctx.addIssue({
+        path: ["confirm_password"],
+        code: z.ZodIssueCode.custom,
+        message: "As senhas precisam ser iguais",
+      });
+    }
+  });
+
+const adminUpdateUserSchema = z.object({
+  name: z
+    .string()
+    .refine((val) => !val || val.length >= 3, {
+      message: "O nome deve ter mais de 3 letras.",
+    })
+    .refine(
+      (val) => !val || /^[A-Za-zÀ-ÿ]+(?:[-'\s][A-Za-zÀ-ÿ]+)*$/.test(val),
+      "O nome deve conter apenas letras e espaços.",
+    )
+    .optional(),
+  cpf: z
+    .string()
+    .optional()
+    .refine(
+      (cpf) => !cpf || cpfValidator.isValid(cpf),
+      "O CPF deve ser válido.",
+    ),
+  email: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || z.string().email().safeParse(val).success,
+      "O email deve ser válido.",
+    ),
+  birth_day: z.string().refine((val) => {
+    const today = new Date();
+    const minAge = new Date(
+      today.getFullYear() - 16,
+      today.getMonth(),
+      today.getDate(),
+    );
+    return !val || new Date(val) <= minAge;
+  }, "O usuário deve ter, pelo menos, 16 anos."),
+  features: z
+    .string()
+    .refine(
+      (val) =>
+        !val ||
+        z.enum(["client", "professional", "admin"]).safeParse(val).success,
+      "Selecione um tipo válido.",
+    ),
+  password: z
+    .string()
+    .refine(
+      (val) => !val || val.length >= 8,
+      "A senha deve ter, no mínimo, 8 caracteres.",
+    ),
+  address: z.object({
+    street: z
+      .string()
+      .refine(
+        (val) => !val || /^[\p{L}0-9 ]+$/u.test(val),
+        "A rua deve conter apenas letras e números.",
+      )
+      .refine(
+        (val) => !val || val >= 8,
+        "A rua deve conter, pelo menos, 8 letras.",
+      ),
+    number: z
+      .string()
+      .transform((val) => (val ? Number.parseInt(val) : ""))
+      .refine(
+        (val) =>
+          val === "" || (Number.isInteger(val) && val > 0 && val < 99999),
+        "O número precisa ser válido.",
+      )
+      .optional(),
+    complement: z.string().min(0).max(40, "O complemento deve ser mais curto."),
+    reference: z.string().min(0).max(40, "A referência deve ser mais curta."),
+    state: z.string(),
+    city: z.string(),
+  }),
+});
 
 function Clients() {
-  const rawData = [
-    {
-      name: "José da Silva",
-      email: "jose.silva@gmail.com",
-      cpf: "12345678900",
-      birth_day: "1990-02-15T00:00:00Z",
-      created_at: "2025-04-10T19:23:00Z",
-      updated_at: "2025-04-10T19:23:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Rui Barbosa",
-        number: 102,
-        complement: "Apartamento 201",
-        reference: "Próximo ao mercado central",
-      },
-    },
-    {
-      name: "Maria Oliveira",
-      email: "maria.oliveira@yahoo.com",
-      cpf: "23456789011",
-      birth_day: "1987-07-23T00:00:00Z",
-      created_at: "2025-04-11T08:15:00Z",
-      updated_at: "2025-04-11T08:15:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Avenida Brasil",
-        number: 450,
-        complement: null,
-        reference: "Em frente à praça principal",
-      },
-    },
-    {
-      name: "Carlos Souza",
-      email: "carlos.souza@hotmail.com",
-      cpf: "34567890122",
-      birth_day: "1992-11-09T00:00:00Z",
-      created_at: "2025-04-12T14:42:00Z",
-      updated_at: "2025-04-12T14:42:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Anita Garibaldi",
-        number: 230,
-        complement: "Casa",
-        reference: "Perto da escola estadual",
-      },
-    },
-    {
-      name: "Ana Paula Costa",
-      email: "ana.paula@gmail.com",
-      cpf: "45678901233",
-      birth_day: "1995-03-01T00:00:00Z",
-      created_at: "2025-04-13T16:30:00Z",
-      updated_at: "2025-04-13T16:30:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Victor Konder",
-        number: 89,
-        complement: null,
-        reference: "Ao lado da farmácia São João",
-      },
-    },
-    {
-      name: "Fernando Lima",
-      email: "fernando.lima@outlook.com",
-      cpf: "56789012344",
-      birth_day: "1989-05-17T00:00:00Z",
-      created_at: "2025-04-13T10:05:00Z",
-      updated_at: "2025-04-13T10:05:00Z",
-      features: ["professional"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Olavo Bilac",
-        number: 152,
-        complement: "Fundos",
-        reference: "Atrás da padaria Pão Quente",
-      },
-    },
-    {
-      name: "Juliana Martins",
-      email: "juliana.martins@gmail.com",
-      cpf: "67890123455",
-      birth_day: "1993-08-29T00:00:00Z",
-      created_at: "2025-04-14T09:20:00Z",
-      updated_at: "2025-04-14T09:20:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Rui Barbosa",
-        number: 118,
-        complement: "Sala 3",
-        reference: "Próximo ao shopping center",
-      },
-    },
-    {
-      name: "Rafael Pereira",
-      email: "rafael.pereira@uol.com.br",
-      cpf: "78901234566",
-      birth_day: "1991-12-10T00:00:00Z",
-      created_at: "2025-04-14T18:00:00Z",
-      updated_at: "2025-04-14T18:00:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Anita Garibaldi",
-        number: 320,
-        complement: null,
-        reference: "Atrás da academia Fitness Plus",
-      },
-    },
-    {
-      name: "Larissa Fernandes",
-      email: "larissa.fernandes@gmail.com",
-      cpf: "89012345677",
-      birth_day: "1996-04-06T00:00:00Z",
-      created_at: "2025-04-15T11:47:00Z",
-      updated_at: "2025-04-15T11:47:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Victor Konder",
-        number: 75,
-        complement: "Cobertura",
-        reference: "Em cima da pizzaria Don Juan",
-      },
-    },
-    {
-      name: "Bruno Rocha",
-      email: "bruno.rocha@icloud.com",
-      cpf: "90123456788",
-      birth_day: "1990-06-18T00:00:00Z",
-      created_at: "2025-04-15T15:35:00Z",
-      updated_at: "2025-04-15T15:35:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Avenida Brasil",
-        number: 580,
-        complement: "Loja 2",
-        reference: "Ao lado da loja Americanas",
-      },
-    },
-    {
-      name: "Camila Ribeiro",
-      email: "camila.ribeiro@gmail.com",
-      cpf: "01234567899",
-      birth_day: "1994-01-22T00:00:00Z",
-      created_at: "2025-04-16T13:12:00Z",
-      updated_at: "2025-04-16T13:12:00Z",
-      features: ["client"],
-      address: {
-        state: "SC",
-        city: "Xanxerê",
-        street: "Rua Olavo Bilac",
-        number: 240,
-        complement: null,
-        reference: "Em frente ao colégio São Francisco",
-      },
-    },
-  ];
+  const { isLoading, data: rawData } = useSWR("/api/v1/users", fetcher);
 
   const [data, setData] = useState(rawData);
+
+  useEffect(() => {
+    setData(rawData);
+  }, [rawData]);
 
   return (
     <>
@@ -239,11 +229,21 @@ function Clients() {
           <h1 className="font-bold text-2xl">Usuários</h1>
           <h2 className="text-lg">Gerencie os usuários do seu sistema.</h2>
         </div>
-        <div className="gap-4 flex flex-col-reverse md:flex-row items-center justify-between w-full md:w-3/4">
-          <SearchItems rawData={rawData} setData={setData} />
-          <CreateAccount />
-        </div>
-        <ClientsTable data={data} />
+        {isLoading ? (
+          <Skeleton className="h-96  w-full md:w-4/5" />
+        ) : (
+          <>
+            <div className="gap-4 flex flex-col-reverse md:flex-row items-center justify-between w-full md:w-3/4">
+              <SearchItems rawData={rawData} setData={setData} />
+              <CreateAccountDialog>
+                <Button className="w-fit" variant="outline">
+                  <CirclePlus className="h-8, w-8" /> Criar nova conta
+                </Button>
+              </CreateAccountDialog>
+            </div>
+            <ClientsTable data={data} />
+          </>
+        )}
         <Link className="underline text-pool-black" href="/admin">
           Voltar à página principal
         </Link>
@@ -325,142 +325,288 @@ function FilterOptions({ children, filterKey, setFilterKey }) {
   );
 }
 
-function CreateAccount() {
-  return (
-    <CreateAccountDialog>
-      <Button className="w-fit" variant="outline">
-        <CirclePlus className="h-8, w-8" /> Criar nova conta
-      </Button>
-    </CreateAccountDialog>
-  );
-}
-
 function CreateAccountDialog({ children }) {
-  const pages = [
-    <div key="page-1" className="flex flex-col">
-      <div className="flex flex-col gap-2 my-2">
-        <Label htmlFor="name">Nome</Label>
-        <Input
-          className="w-2/3 disabled:opacity-100 disabled:cursor-default"
-          id="name"
-        />
-      </div>
-      <div className="flex flex-col gap-2 my-2">
-        <Label htmlFor="cpf">CPF</Label>
-        <Input
-          className="w-1/2 disabled:opacity-100 disabled:cursor-default"
-          id="cpf"
-        />
-      </div>
-      <div className="flex flex-col gap-2 my-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          className="w-2/3 disabled:opacity-100 disabled:cursor-default"
-          id="email"
-        />
-      </div>
-      <div className="flex flex-col gap-2 my-2">
-        <Label htmlFor="birthday">Data de nascimento</Label>
-        <Input
-          className="w-fit disabled:opacity-100 disabled:cursor-default"
-          id="birthday"
-          type="date"
-        />
-      </div>
-    </div>,
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(adminCreateUserSchema),
+    mode: "onChange",
+  });
 
-    <div key="page-2" className="flex flex-col">
-      <div className="flex gap-4 items-stretch">
-        <div className="flex w-5/6 flex-col gap-2 my-2">
-          <Label htmlFor="street">Rua</Label>
-          <Input
-            className="w-full disabled:opacity-100 disabled:cursor-default"
-            id="street"
-          />
-        </div>
-        <div className="flex w-1/6 flex-col gap-2 my-2">
-          <Label htmlFor="number">Número</Label>
-          <Input
-            className="w-full disabled:opacity-100 disabled:cursor-default"
-            id="number"
-          />
-        </div>
-      </div>
-      <div className="flex gap-4">
-        <div className="flex w-1/2 flex-col gap-2 my-2">
-          <Label htmlFor="complement">Complemento</Label>
-          <Input
-            className="w-full disabled:opacity-100 disabled:cursor-default"
-            id="complement"
-          />
-        </div>
-        <div className="flex w-1/2 flex-col gap-2 my-2">
-          <Label htmlFor="reference">Referência</Label>
-          <Input
-            className="w-full disabled:opacity-100 disabled:cursor-default"
-            id="reference"
-          />
-        </div>
-      </div>
-      <div className="flex gap-4">
-        <div className="flex w-1/6 flex-col gap-2 my-2">
-          <Label htmlFor="state">Estado</Label>
-          <Input
-            className="w-full disabled:opacity-100 disabled:cursor-default"
-            id="state"
-          />
-        </div>
-        <div className="flex w-1/2 flex-col gap-2 my-2">
-          <Label htmlFor="cities">Cidade</Label>
-          <Input
-            className="w-full disabled:opacity-100 disabled:cursor-default"
-            id="cities"
-          />
-        </div>
-      </div>
-    </div>,
+  const [isOpen, setIsOpen] = useState(false);
+  const state = watch("address.state");
 
-    <div key="page-3" className="flex flex-col">
-      <div className="flex w-2/3 flex-col gap-2 my-2">
-        <Label htmlFor="password">Senha</Label>
-        <Input
-          className="w-full disabled:opacity-100 disabled:cursor-default"
-          id="password"
-        />
-      </div>
-      <div className="flex w-2/3 flex-col gap-2 my-2">
-        <Label htmlFor="password">Confirmar senha</Label>
-        <Input
-          className="w-full disabled:opacity-100 disabled:cursor-default"
-          id="password"
-        />
-      </div>
-    </div>,
+  const features = {
+    client: "Cliente",
+    professional: "Profissional",
+    admin: "Administrador",
+  };
+
+  const { data: states } = useSWR(
+    "https://brasilapi.com.br/api/ibge/uf/v1",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
+    },
+  );
+
+  const { data: cities } = useSWR(
+    state
+      ? `https://brasilapi.com.br/api/ibge/municipios/v1/${watch("address.state")}`
+      : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
+    },
+  );
+
+  async function onSubmit(data) {
+    data = {
+      ...data,
+      features: [data.features],
+    };
+
+    const response = await fetch("/api/v1/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.status === 201) {
+      mutate("/api/v1/users");
+      setIsOpen(false);
+    }
+  }
+
+  const steps = [
+    [
+      <FormField
+        key="name"
+        id="name"
+        label="Nome Completo"
+        placeholder="Fulano da Silva"
+        error={errors.name}
+        register={register}
+      />,
+      <FormField
+        key="cpf"
+        id="cpf"
+        label="CPF"
+        placeholder="012.345.678-90"
+        error={errors.cpf}
+        register={register}
+      />,
+      <FormField
+        key="email"
+        id="email"
+        label="Email"
+        placeholder="exemplo@email.com"
+        error={errors.email}
+        register={register}
+      />,
+      <FormField
+        key="birth_day"
+        className="w-fit"
+        id="birth_day"
+        type="date"
+        label="Data de nascimento"
+        error={errors.birth_day}
+        register={register}
+      />,
+    ],
+    [
+      <FormField
+        key="street"
+        id="street"
+        prefix="address"
+        label="Rua"
+        error={errors.address?.street}
+        register={register}
+        placeholder="Rua dos Santos"
+      />,
+      <FormField
+        key="number"
+        id="number"
+        prefix="address"
+        label="Número"
+        error={errors.address?.number}
+        register={register}
+        placeholder="1029"
+      />,
+      <FormField
+        key="complement"
+        id="complement"
+        prefix="address"
+        label="Complemento (opcional)"
+        error={errors.address?.complement}
+        register={register}
+        placeholder="Apartamento 101"
+      />,
+      <>
+        {/* Estado e cidade */}
+        <div key="location" className="flex gap-4">
+          <div className="flex flex-col gap-1 w-32">
+            <Label htmlFor="state">Estado</Label>
+            <Controller
+              name="address.state"
+              control={control}
+              rules={{ required: "Estado é obrigatório" }}
+              defaultValue=""
+              render={({ field }) => (
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger
+                    className={
+                      "w-full" +
+                      (errors.address?.state ? ` border-red-400` : "")
+                    }
+                  >
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Estados</SelectLabel>
+                      {states &&
+                        states.map((sail) => (
+                          <SelectItem key={sail.id} value={sail.sigla}>
+                            {sail.sigla}
+                          </SelectItem>
+                        ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.address?.state && (
+              <p className="text-xs text-red-600">
+                {errors.address?.state.message}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col gap-1 w-full">
+            <Label htmlFor="city">Cidade</Label>
+            <Controller
+              name="address.city"
+              control={control}
+              rules={{ required: "Cidade é obrigatória" }}
+              defaultValue=""
+              render={({ field }) => (
+                <Select
+                  id="city"
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger
+                    className={
+                      "w-full" + (errors.address?.city ? ` border-red-400` : "")
+                    }
+                  >
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Cidades</SelectLabel>
+                      {cities &&
+                        cities.map((city) => (
+                          <SelectItem key={city.nome} value={city.nome}>
+                            {city.nome}
+                          </SelectItem>
+                        ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.address?.city && (
+              <p className="text-xs text-red-600">
+                {errors.address?.city.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </>,
+      <FormField
+        key="reference"
+        id="reference"
+        prefix="address"
+        label="Referência (opcional)"
+        error={errors.address?.reference}
+        register={register}
+        placeholder="Ao lado da loja XYZ"
+      />,
+    ],
+    [
+      <>
+        <div key="features" className="flex flex-col gap-1 w-full">
+          <Label htmlFor="features">Tipo</Label>
+          <Controller
+            name="features"
+            control={control}
+            rules={{ required: "O Tipo é obrigatório" }}
+            defaultValue=""
+            render={({ field }) => (
+              <Select
+                id="feature"
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <SelectTrigger
+                  className={
+                    "w-full" + (errors.features ? ` border-red-400` : "")
+                  }
+                >
+                  <SelectValue placeholder="" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {Object.entries(features).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.features && (
+            <p className="text-xs text-red-600">{errors.features.message}</p>
+          )}
+        </div>
+      </>,
+      <FormField
+        key="password"
+        id="password"
+        label="Senha"
+        type="password"
+        error={errors.password}
+        register={register}
+      />,
+      <FormField
+        key="confirm_password"
+        id="confirm_password"
+        label="Senha"
+        type="password"
+        error={errors.confirm_password}
+        register={register}
+      />,
+    ],
   ];
 
-  const [numberPage, setNumberPage] = useState(0);
-
-  function onClickConfirm(e) {
-    if (numberPage < pages.length - 1) {
-      e.preventDefault();
-      setNumberPage(numberPage + 1);
-    } else {
-      setTimeout(() => {
-        setNumberPage(0);
-      }, 150);
-      //post na api
-    }
-  }
-
-  function onClickCancel(e) {
-    if (numberPage > 0) {
-      e.preventDefault();
-      setNumberPage(numberPage - 1);
-    }
-  }
-
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -469,19 +615,7 @@ function CreateAccountDialog({ children }) {
             Adicione os dados abaixo para criar uma nova conta.
           </DialogDescription>
         </DialogHeader>
-        {pages[numberPage]}
-        <DialogFooter className="flex-row justify-end">
-          <DialogClose asChild>
-            <Button variant="outline" onClick={onClickCancel}>
-              {numberPage > 0 ? "Voltar" : "Cancelar"}
-            </Button>
-          </DialogClose>
-          <DialogClose>
-            <Button onClick={onClickConfirm}>
-              {numberPage < pages.length - 1 ? "Próximo" : "Confirmar"}
-            </Button>
-          </DialogClose>
-        </DialogFooter>
+        <Form steps={steps} error={errors} onSubmit={handleSubmit(onSubmit)} />
       </DialogContent>
     </Dialog>
   );
@@ -501,29 +635,34 @@ function ClientsTable({ data }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((user) => {
-          return (
-            <TableRow key={user.id} className="justify-center">
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.cpf}</TableCell>
-              <TableCell className="hidden md:table-cell">
-                {user.email}
-              </TableCell>
-              <TableCell className="hidden md:table-cell">
-                {new Date(user.birth_day).toLocaleDateString("pt-BR")}
-              </TableCell>
-              <TableCell>
-                <UserOptions data={user} />
-              </TableCell>
-            </TableRow>
-          );
-        })}
+        {data &&
+          data?.map((user) => {
+            return (
+              <TableRow key={user.id} className="justify-center">
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.cpf}</TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {user.email}
+                </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {new Date(user.birth_day).toLocaleDateString("pt-BR")}
+                </TableCell>
+                <TableCell>
+                  <UserOptions data={user} />
+                </TableCell>
+              </TableRow>
+            );
+          })}
       </TableBody>
     </Table>
   );
 }
 
 function UserOptions({ data }) {
+  const { isLoading, user } = useUser();
+
+  console.log(user.id === data.id);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -533,8 +672,12 @@ function UserOptions({ data }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <UserDetails data={data} />
-        <UserUpdate />
-        <UserDelete />
+        <UserUpdate id={data.id} />
+        {!isLoading && user?.id != data.id ? (
+          <UserDelete id={data.id} />
+        ) : (
+          <></>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -568,33 +711,33 @@ function UserDetails({ data }) {
           <TabsContent value="account">
             <div className="flex flex-col w-full">
               <div className="flex gap-4 my-2 w-full">
-                <Label htmlFor="name" className="w-1/3 justify-end">
+                <Label htmlFor="name" className="w-1/4 justify-end">
                   Nome
                 </Label>
                 <Input
-                  className="w-2/3 disabled:opacity-100 disabled:cursor-default"
+                  className="w-3/4 disabled:opacity-100 disabled:cursor-default"
                   id="name"
                   disabled
                   value={data.name}
                 />
               </div>
               <div className="flex gap-4 my-2 w-full">
-                <Label htmlFor="cpf" className="w-1/3 justify-end">
+                <Label htmlFor="cpf" className="w-1/4 justify-end">
                   CPF
                 </Label>
                 <Input
-                  className="w-2/3 disabled:opacity-100 disabled:cursor-default"
+                  className="w-3/4 disabled:opacity-100 disabled:cursor-default"
                   id="cpf"
                   disabled
                   value={data.cpf}
                 />
               </div>
               <div className="flex gap-4 my-2 w-full">
-                <Label htmlFor="email" className="w-1/3 justify-end">
+                <Label htmlFor="email" className="w-1/12 justify-end">
                   Email
                 </Label>
                 <Input
-                  className="w-2/3 disabled:opacity-100 disabled:cursor-default"
+                  className="w-11/12 disabled:opacity-100 disabled:cursor-default"
                   id="email"
                   disabled
                   value={data.email}
@@ -603,11 +746,11 @@ function UserDetails({ data }) {
               <div className="flex gap-4 my-2 w-full">
                 <Label
                   htmlFor="birthday"
-                  className="w-1/3 justify-end text-end"
+                  className="w-1/4 justify-end text-end"
                 >
                   Data de nascimento
                 </Label>
-                <div className="w-2/3">
+                <div className="w-3/4">
                   <Input
                     className="w-fit disabled:opacity-100 disabled:cursor-default"
                     id="birthday"
@@ -630,7 +773,7 @@ function UserDetails({ data }) {
                   <Label className="w-1/3 justify-end" htmlFor="street">
                     Rua
                   </Label>
-                  <Input
+                  <Textarea
                     className="w-2/3 disabled:opacity-100 disabled:cursor-default"
                     id="street"
                     disabled
@@ -657,7 +800,7 @@ function UserDetails({ data }) {
                     Complemento
                   </Label>
                   <div className="w-2/3">
-                    <Input
+                    <Textarea
                       className="md:w-2/3 disabled:opacity-100 disabled:cursor-default"
                       id="complement"
                       disabled
@@ -668,7 +811,7 @@ function UserDetails({ data }) {
 
                 <div className="flex flex-row gap-4 my-2">
                   <Label className="w-1/3 justify-end" htmlFor="state">
-                    Estado
+                    Estado (UF)
                   </Label>
                   <div className="w-2/3">
                     <Input
@@ -748,127 +891,312 @@ function UserDetails({ data }) {
   );
 }
 
-function UserUpdate() {
+function UserUpdate({ id }) {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(adminUpdateUserSchema),
+    mode: "onChange",
+  });
+
+  const [isOpen, setIsOpen] = useState(false);
+  const state = watch("address.state");
+
+  const features = {
+    client: "Cliente",
+    professional: "Profissional",
+    admin: "Administrador",
+  };
+
+  const { data: states } = useSWR(
+    "https://brasilapi.com.br/api/ibge/uf/v1",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
+    },
+  );
+
+  const { data: cities } = useSWR(
+    state
+      ? `https://brasilapi.com.br/api/ibge/municipios/v1/${watch("address.state")}`
+      : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
+    },
+  );
+
+  async function onSubmit(data) {
+    data = {
+      ...data,
+      features: [data.features],
+    };
+
+    for (const key in data) {
+      if (!data[key][0]) {
+        delete data[key];
+      }
+    }
+
+    const response = await fetch(`/api/v1/users?id=${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    console.log(await response.json());
+
+    if (response.status === 200) {
+      mutate("/api/v1/users");
+      setIsOpen(false);
+    }
+  }
+
+  const steps = [
+    [
+      <FormField
+        key="name"
+        id="name"
+        label="Nome Completo"
+        placeholder="Fulano da Silva"
+        error={errors.name}
+        register={register}
+      />,
+      <FormField
+        key="cpf"
+        id="cpf"
+        label="CPF"
+        placeholder="012.345.678-90"
+        error={errors.cpf}
+        register={register}
+      />,
+      <FormField
+        key="email"
+        id="email"
+        label="Email"
+        placeholder="exemplo@email.com"
+        error={errors.email}
+        register={register}
+      />,
+      <FormField
+        key="birth_day"
+        className="w-fit"
+        id="birth_day"
+        type="date"
+        label="Data de nascimento"
+        error={errors.birth_day}
+        register={register}
+      />,
+    ],
+    [
+      <FormField
+        key="street"
+        id="street"
+        prefix="address"
+        label="Rua"
+        error={errors.address?.street}
+        register={register}
+        placeholder="Rua dos Santos"
+      />,
+      <FormField
+        key="number"
+        id="number"
+        prefix="address"
+        label="Número"
+        error={errors.address?.number}
+        register={register}
+        placeholder="1029"
+      />,
+      <FormField
+        key="complement"
+        id="complement"
+        prefix="address"
+        label="Complemento (opcional)"
+        error={errors.address?.complement}
+        register={register}
+        placeholder="Apartamento 101"
+      />,
+      <div key="state-city-row" className="flex gap-4">
+        <div key="state" className="flex flex-col gap-1 w-32">
+          <Label htmlFor="state">Estado</Label>
+          <Controller
+            name="address.state"
+            control={control}
+            rules={{ required: "Estado é obrigatório" }}
+            defaultValue=""
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger
+                  className={
+                    "w-full" + (errors.address?.state ? ` border-red-400` : "")
+                  }
+                >
+                  <SelectValue placeholder="" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Estados</SelectLabel>
+                    {states &&
+                      states.map((sail) => (
+                        <SelectItem key={sail.id} value={sail.sigla}>
+                          {sail.sigla}
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.address?.state && (
+            <p className="text-xs text-red-600">
+              {errors.address?.state.message}
+            </p>
+          )}
+        </div>
+        <div key="city" className="flex flex-col gap-1 w-full">
+          <Label htmlFor="city">Cidade</Label>
+          <Controller
+            name="address.city"
+            control={control}
+            rules={{ required: "Cidade é obrigatória" }}
+            defaultValue=""
+            render={({ field }) => (
+              <Select
+                id="city"
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <SelectTrigger
+                  className={
+                    "w-full" + (errors.address?.city ? ` border-red-400` : "")
+                  }
+                >
+                  <SelectValue placeholder="" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Cidades</SelectLabel>
+                    {cities &&
+                      cities.map((city) => (
+                        <SelectItem key={city.nome} value={city.nome}>
+                          {city.nome}
+                        </SelectItem>
+                      ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.address?.city && (
+            <p className="text-xs text-red-600">
+              {errors.address?.city.message}
+            </p>
+          )}
+        </div>
+      </div>,
+      <FormField
+        key="reference"
+        id="reference"
+        prefix="address"
+        label="Referência (opcional)"
+        error={errors.address?.reference}
+        register={register}
+        placeholder="Ao lado da loja XYZ"
+      />,
+    ],
+    [
+      <div key="features" className="flex flex-col gap-1 w-full">
+        <Label htmlFor="features">Tipo</Label>
+        <Controller
+          name="features"
+          control={control}
+          rules={{ required: "O Tipo é obrigatório" }}
+          defaultValue=""
+          render={({ field }) => (
+            <Select
+              id="feature"
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+            >
+              <SelectTrigger
+                className={
+                  "w-full" + (errors.features ? ` border-red-400` : "")
+                }
+              >
+                <SelectValue placeholder="" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {Object.entries(features).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.features && (
+          <p className="text-xs text-red-600">{errors.features.message}</p>
+        )}
+      </div>,
+      <FormField
+        key="password"
+        id="password"
+        label="Senha"
+        type="password"
+        error={errors.password}
+        register={register}
+      />,
+    ],
+  ];
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <DropdownMenuItem>Atualizar</DropdownMenuItem>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Atualizar usuário</DialogTitle>
+          <DialogTitle>Atualizar conta</DialogTitle>
           <DialogDescription>
-            Altere os dados que deseja editar. Caso não queira alterar, deixe em
+            Insira os dados para alterar. Caso não queira alterar, deixe em
             branco.
           </DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue="account" className="w-full gap-4">
-          <TabsList className="self-center">
-            <TabsTrigger value="account">Dados Pessoais</TabsTrigger>
-            <TabsTrigger value="adress">Endereço</TabsTrigger>
-          </TabsList>
-          <TabsContent value="account">
-            <div className="flex flex-col">
-              <div className="flex flex-col gap-2 my-2">
-                <Label htmlFor="name">Nome</Label>
-                <Input
-                  className="w-2/3 disabled:opacity-100 disabled:cursor-default"
-                  id="name"
-                />
-              </div>
-              <div className="flex flex-col gap-2 my-2">
-                <Label htmlFor="cpf">CPF</Label>
-                <Input
-                  className="w-1/2 disabled:opacity-100 disabled:cursor-default"
-                  id="cpf"
-                />
-              </div>
-              <div className="flex flex-col gap-2 my-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  className="w-2/3 disabled:opacity-100 disabled:cursor-default"
-                  id="email"
-                />
-              </div>
-              <div className="flex flex-col gap-2 my-2">
-                <Label htmlFor="birthday">Data de nascimento</Label>
-                <Input
-                  className="w-fit disabled:opacity-100 disabled:cursor-default"
-                  id="birthday"
-                  type="date"
-                />
-              </div>
-            </div>
-          </TabsContent>
-          <TabsContent value="adress">
-            <div className="flex flex-col">
-              <div className="flex gap-4 items-stretch">
-                <div className="flex w-5/6 flex-col gap-2 my-2">
-                  <Label htmlFor="client">Rua</Label>
-                  <Input
-                    className="w-full disabled:opacity-100 disabled:cursor-default"
-                    id="client"
-                  />
-                </div>
-                <div className="flex w-1/6 flex-col gap-2 my-2">
-                  <Label htmlFor="client">Número</Label>
-                  <Input
-                    className="w-full disabled:opacity-100 disabled:cursor-default"
-                    id="client"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex w-1/2 flex-col gap-2 my-2">
-                  <Label htmlFor="complement">Complemento</Label>
-                  <Input
-                    className="w-full disabled:opacity-100 disabled:cursor-default"
-                    id="complement"
-                  />
-                </div>
-                <div className="flex w-1/2 flex-col gap-2 my-2">
-                  <Label htmlFor="number">Número</Label>
-                  <Input
-                    className="w-full disabled:opacity-100 disabled:cursor-default"
-                    id="number"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex w-1/6 flex-col gap-2 my-2">
-                  <Label htmlFor="state">Estado</Label>
-                  <Input
-                    className="w-full disabled:opacity-100 disabled:cursor-default"
-                    id="state"
-                  />
-                </div>
-                <div className="flex w-1/2 flex-col gap-2 my-2">
-                  <Label htmlFor="city">Cidade</Label>
-                  <Input
-                    className="w-full disabled:opacity-100 disabled:cursor-default"
-                    id="city"
-                  />
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="ghost">Cancelar</Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button>Atualizar</Button>
-          </DialogClose>
-        </DialogFooter>
+        <Form steps={steps} error={errors} onSubmit={handleSubmit(onSubmit)} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function UserDelete() {
+function UserDelete({ id }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  async function onSubmit() {
+    const response = await fetch(`/api/v1/users?id=${id}`, {
+      method: "DELETE",
+    });
+
+    if (response.status !== 200) return;
+
+    mutate("/api/v1/users");
+    setIsOpen(false);
+  }
+
   return (
-    <AlertDialog>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <DropdownMenuItem>Deletar</DropdownMenuItem>
       </AlertDialogTrigger>
@@ -881,12 +1209,12 @@ function UserDelete() {
           possibilidade de desfazer a ação. Deseja confirmar?
         </p>
         <AlertDialogFooter className="mt-2 flex-row justify-end">
-          <AlertDialogAction>
-            <Button>Cancelar</Button>
-          </AlertDialogAction>
           <AlertDialogCancel asChild>
-            <Button variant="outline">Confirmar</Button>
+            <Button variant="outline">Cancelar</Button>
           </AlertDialogCancel>
+          <AlertDialogAction asChild>
+            <Button onClick={onSubmit}>Confirmar</Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

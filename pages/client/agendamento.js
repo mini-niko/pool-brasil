@@ -15,14 +15,21 @@ import NavigationBar from "@/interface/components/NavigationBar";
 import { ArrowLeft, PartyPopper } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
+import { differenceInDays, format, set } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import Confetti from "react-confetti";
 import { Input } from "@/components/ui/input";
 import Container from "@/interface/components/Container";
+import useSWR from "swr";
+import { fetcher } from "@/lib/utils";
+import OpenMap from "@/interface/components/OpenMap";
+import useUser from "@/interface/hooks/useUser";
+
 function Agendamento() {
   const router = useRouter();
+
+  const { user } = useUser();
 
   const [step, setStep] = useState(1);
 
@@ -37,6 +44,7 @@ function Agendamento() {
   const state = useState("SC");
   const city = useState("");
   const reference = useState("");
+  const coordinates = useState("");
 
   const data = {
     professional,
@@ -46,6 +54,7 @@ function Agendamento() {
   };
 
   const adressData = {
+    coordinates,
     street,
     complement,
     number,
@@ -53,6 +62,39 @@ function Agendamento() {
     city,
     reference,
   };
+
+  async function postAppointment() {
+    const [hours, minutes] = time[0].split(":");
+    const { latitude, longitude } = coordinates[0];
+
+    const appointmentData = {
+      client_id: user.id,
+      professional_id: professional[0].id,
+      date_time: set(date[0], { hours, minutes }),
+      service_id: service[0].id,
+      location: {
+        street: street[0],
+        complement: complement[0],
+        number: number[0],
+        state: state[0],
+        city: city[0],
+        reference: reference[0],
+        latitude,
+        longitude,
+      },
+    };
+
+    const response = await fetch("/api/v1/appointment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(appointmentData),
+    });
+
+    if (response.status !== 201) return false;
+    return true;
+  }
 
   return (
     <>
@@ -82,11 +124,10 @@ function Agendamento() {
               ...adressData,
             }}
             next={() => {
-              setTimeout(() => {
-                setStep(4);
-              }, 3000);
+              setStep(4);
             }}
             back={() => setStep(2)}
+            postAppointment={postAppointment}
           />
         )}
         {step === 4 && <StepFour />}
@@ -101,6 +142,18 @@ function StepOne({ data, next, back }) {
   const [date, setDate] = data.date;
   const [time, setTime] = data.time;
 
+  const professionals = useSWR("/api/v1/appointment/professionals", fetcher);
+  const services = useSWR("/api/v1/appointment/services", fetcher);
+
+  const formattedDate = date ? format(date, "yyyy-MM-dd") : null;
+
+  const avaliableHours = useSWR(
+    formattedDate && professional
+      ? `/api/v1/appointments/professional/avaliable-time?date=${formattedDate}&id=${professional.id}`
+      : null,
+    fetcher,
+  );
+
   return (
     <form
       onSubmit={(e) => e.preventDefault()}
@@ -114,24 +167,32 @@ function StepOne({ data, next, back }) {
           >
             Qual profissional você deseja?
           </Label>
-          <Select value={professional} onValueChange={setProfessional}>
-            <SelectTrigger className="w-full">
+          <Select
+            onValueChange={(value) => {
+              const professional = professionals.data.find(
+                (p) => p.id === value,
+              );
+              setProfessional(professional);
+            }}
+          >
+            <SelectTrigger
+              className="w-full"
+              disabled={professionals.isLoading}
+            >
               <SelectValue placeholder="Selecione seu profissional" />
             </SelectTrigger>
             <SelectContent>
-              <SelectGroup>
-                {[
-                  "Pedro Augusto Marques",
-                  "Victor Hugo Cintra Matos",
-                  "Dionysius Polidônio",
-                ].map((name, index) => {
-                  return (
-                    <SelectItem key={index} value={name}>
-                      {name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectGroup>
+              {professionals.data && (
+                <SelectGroup>
+                  {professionals.data.map((user) => {
+                    return (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.name}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -139,16 +200,23 @@ function StepOne({ data, next, back }) {
           <Label htmlFor="professional" className="text-lg text-pool-black">
             Qual serviço você precisa?
           </Label>
-          <Select value={service} onValueChange={setService}>
-            <SelectTrigger className="w-full">
+          <Select
+            onValueChange={(value) => {
+              const service = services.data.find(
+                (s) => s.id === parseInt(value),
+              );
+              setService(service);
+            }}
+          >
+            <SelectTrigger className="w-full" disabled={services.isLoading}>
               <SelectValue placeholder="Selecione seu serviço" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                {["Limpeza", "Manutenção"].map((name, index) => {
+                {services.data?.map((service) => {
                   return (
-                    <SelectItem key={index} value={name}>
-                      {name}
+                    <SelectItem key={service.id} value={service.id.toString()}>
+                      {service.type}
                     </SelectItem>
                   );
                 })}
@@ -169,7 +237,8 @@ function StepOne({ data, next, back }) {
           disabled={(date) =>
             date < new Date(new Date().setHours(0, 0, 0, 0)) ||
             date.getDay() === 0 ||
-            date.getDay() === 6
+            date.getDay() === 4 ||
+            differenceInDays(date, Date.now()) < 2
           }
         />
         <Select value={time} onValueChange={setTime}>
@@ -178,15 +247,15 @@ function StepOne({ data, next, back }) {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              {["8:00", "9:00", "10:00", "11:00", "13:00", "14:00"].map(
-                (time, index) => {
+              {avaliableHours.data &&
+                !avaliableHours.error &&
+                avaliableHours.data?.map((time, index) => {
                   return (
                     <SelectItem key={index} value={time}>
                       {time}
                     </SelectItem>
                   );
-                },
-              )}
+                })}
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -214,7 +283,9 @@ function StepTwo({ data, next, back }) {
   const [city, setCity] = data.city;
   const [reference, setReference] = data.reference;
 
-  const allFieldsFilled = street && number && state && city;
+  const [coordinates, setCoordinates] = data.coordinates;
+
+  const allFieldsFilled = street && number && state && city && coordinates;
 
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
@@ -260,120 +331,142 @@ function StepTwo({ data, next, back }) {
     fetchCities();
   }, [state]);
 
+  useEffect(() => {
+    (async () => {
+      if (!coordinates) return;
+
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coordinates.latitude}&lon=${coordinates.longitude}`,
+      );
+
+      const data = await response.json();
+
+      setStreet(data.address?.road || "");
+      setCity(
+        data.address.town?.toUpperCase() || data.address.city?.toUpperCase(),
+      );
+    })();
+  }, [setCity, setStreet, coordinates]);
+
   return (
-    <form
-      onSubmit={(e) => e.preventDefault()}
-      className="flex flex-col items-center gap-8 w-full px-8 md:px-64"
-    >
-      <div className="w-full flex flex-col items-center gap-8">
-        <div className="w-full">
-          <Label htmlFor="street" className="text-lg text-pool-black">
-            Rua
-          </Label>
-          <Input
-            id="street"
-            value={street}
-            onChange={(e) => setStreet(e.target.value)}
-            placeholder="Ex: Rua das Palmeiras, 456"
-          />
-        </div>
-
-        <div className="w-full">
-          <Label
-            htmlFor="complement"
-            className="text-lg font-semibold text-pool-black"
-          >
-            Complemento
-          </Label>
-          <Input
-            id="complement"
-            value={complement}
-            onChange={(e) => setComplement(e.target.value)}
-            placeholder="Ex: Apto 301, Bloco A"
-          />
-        </div>
-
-        <div className="flex gap-8 flex-col md:flex-row w-full">
-          <div className="flex-1">
-            <Label
-              htmlFor="numero"
-              className="text-lg font-semibold text-pool-black"
-            >
-              Número
+    <>
+      <div className="w-full h-[512px]">
+        <OpenMap setCoordinates={setCoordinates} />
+      </div>
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className="flex flex-col items-center gap-8 w-full px-8 md:px-64"
+      >
+        <div className="w-full flex flex-col items-center gap-8">
+          <div className="w-full">
+            <Label htmlFor="street" className="text-lg text-pool-black">
+              Rua
             </Label>
             <Input
-              id="numero"
-              type="number"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
-              placeholder="Ex: 123"
+              id="street"
+              value={street}
+              onChange={(e) => setStreet(e.target.value)}
+              placeholder="Ex: Rua das Palmeiras, 456"
             />
           </div>
-          <div className="flex-1">
-            <Label className="text-lg font-semibold text-pool-black">
-              Estado
+
+          <div className="w-full">
+            <Label
+              htmlFor="complement"
+              className="text-lg font-semibold text-pool-black"
+            >
+              Complemento
             </Label>
-            <Select value={state} onValueChange={setState}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um estado" />
-              </SelectTrigger>
-              <SelectContent>
-                {states.map((estado) => (
-                  <SelectItem key={estado} value={estado}>
-                    {estado}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              id="complement"
+              value={complement}
+              onChange={(e) => setComplement(e.target.value)}
+              placeholder="Ex: Apto 301, Bloco A"
+            />
           </div>
-          <div className="flex-1">
-            <Label className="text-lg font-semibold text-pool-black">
-              Cidade
+
+          <div className="flex gap-8 flex-col md:flex-row w-full">
+            <div className="flex-1">
+              <Label
+                htmlFor="numero"
+                className="text-lg font-semibold text-pool-black"
+              >
+                Número
+              </Label>
+              <Input
+                id="numero"
+                type="number"
+                value={number}
+                onChange={(e) => setNumber(e.target.value)}
+                placeholder="Ex: 123"
+              />
+            </div>
+            <div className="flex-1">
+              <Label className="text-lg font-semibold text-pool-black">
+                Estado
+              </Label>
+              <Select value={state} onValueChange={setState}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  {states.map((estado) => (
+                    <SelectItem key={estado} value={estado}>
+                      {estado}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <Label className="text-lg font-semibold text-pool-black">
+                Cidade
+              </Label>
+              <Select value={city} onValueChange={setCity}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma cidade" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((name) => (
+                    <SelectItem key={name} value={name}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="w-full">
+            <Label
+              htmlFor="reference"
+              className="text-lg font-semibold text-pool-black"
+            >
+              Referência
             </Label>
-            <Select value={city} onValueChange={setCity}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma cidade" />
-              </SelectTrigger>
-              <SelectContent>
-                {cities.map((name) => (
-                  <SelectItem key={name} value={name}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              id="reference"
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              placeholder="Ex: Próximo ao supermercado XYZ"
+            />
           </div>
         </div>
 
-        <div className="w-full">
-          <Label
-            htmlFor="reference"
-            className="text-lg font-semibold text-pool-black"
-          >
-            Referência
-          </Label>
-          <Input
-            id="reference"
-            value={reference}
-            onChange={(e) => setReference(e.target.value)}
-            placeholder="Ex: Próximo ao supermercado XYZ"
-          />
+        <div className="flex w-96 mt-4 items-center justify-evenly">
+          <Button onClick={back} variant="secondary">
+            <ArrowLeft className="h-4 w-4" /> Voltar
+          </Button>
+          <Button disabled={!allFieldsFilled} onClick={next}>
+            Próximo
+          </Button>
         </div>
-      </div>
-
-      <div className="flex w-96 mt-4 items-center justify-evenly">
-        <Button onClick={back} variant="secondary">
-          <ArrowLeft className="h-4 w-4" /> Voltar
-        </Button>
-        <Button disabled={!allFieldsFilled} onClick={next}>
-          Próximo
-        </Button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }
 
-function StepThree({ data, next, back }) {
+function StepThree({ data, next, back, postAppointment }) {
   const [professional] = data.professional;
   const [service] = data.service;
   const [date] = data.date;
@@ -387,7 +480,6 @@ function StepThree({ data, next, back }) {
   const [reference] = data.reference;
 
   const [checked, setChecked] = useState(false);
-
   const [disabled, setDisabled] = useState(false);
 
   function getCityFormated() {
@@ -410,13 +502,13 @@ function StepThree({ data, next, back }) {
     <>
       <div className="w-full flex flex-col items-center justify-center gap-4">
         <div className="flex w-full px-8 md:p-0 justify-center flex-col md:flex-row text-center">
-          <div className="p-2 w-full md:w-64 rounded-tl-xl rounded-tr-xl md:rounded-tr-none bg-pool-dark shadow-xl shadow-pool-dark/20">
+          <div className="flex items-center justify-center p-2 w-full md:w-64 rounded-tl-xl rounded-tr-xl md:rounded-tr-none bg-pool-dark shadow-xl shadow-pool-dark/20">
             <span className="font-semibold text-pool-white">
               Nome do profissional
             </span>
           </div>
           <div className="p-2 w-full md:w-72 md:rounded-tr-xl bg-pool-white shadow-xl shadow-pool-dark/20">
-            {professional}
+            {professional.name}
           </div>
         </div>
 
@@ -425,7 +517,7 @@ function StepThree({ data, next, back }) {
             <span className="font-semibold text-pool-white">Serviço</span>
           </div>
           <div className="p-2 w-full md:w-72 bg-pool-white shadow-xl shadow-pool-dark/20">
-            {service}
+            {service.type}
           </div>
         </div>
 
@@ -443,7 +535,7 @@ function StepThree({ data, next, back }) {
         </div>
 
         <div className="flex w-full px-8 md:p-0 justify-center flex-col md:flex-row text-center">
-          <div className="p-2 w-full md:w-64 bg-pool-dark shadow-xl shadow-pool-dark/20">
+          <div className="flex items-center justify-center p-2 w-full md:w-64 bg-pool-dark shadow-xl shadow-pool-dark/20">
             <span className="font-semibold text-pool-white h-fit">
               Endereço
             </span>
@@ -498,9 +590,13 @@ function StepThree({ data, next, back }) {
         </Button>
         <Button
           disabled={!checked || disabled}
-          onClick={() => {
+          onClick={async () => {
             setDisabled(true);
-            next();
+            const sucessful = await postAppointment();
+
+            if (sucessful) return next();
+
+            setDisabled(false);
           }}
         >
           Próximo

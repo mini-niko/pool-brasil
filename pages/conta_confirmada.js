@@ -43,8 +43,7 @@ function ContaConfirmada() {
         if (status !== 200) {
           setIsOk(false);
         }
-      } catch (err) {
-        console.error(err);
+      } catch {
         setIsOk(false);
       } finally {
         setIsLoading(false);

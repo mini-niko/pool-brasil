@@ -37,6 +37,16 @@ async function search(key) {
   return query;
 }
 
+async function del(key) {
+  const client = await getClient();
+
+  const query = await client.del(key);
+
+  await client.quit();
+
+  return query;
+}
+
 async function flush() {
   const client = await getClient();
   await client.flushAll();
@@ -47,6 +57,7 @@ const redis = {
   search,
   set,
   flush,
+  del,
 };
 
 export default redis;

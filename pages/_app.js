@@ -4,14 +4,14 @@ import { UserProvider } from "interface/hooks/useUser.js";
 import { Geist } from "next/font/google";
 import { RouterProtector } from "@/interface/hooks/RouterProtector";
 import routes from "@/infra/routes";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 
 const geist = Geist({ subsets: ["latin"] });
 
 export default function RootLayout({ Component, pageProps }) {
   const className = `min-h-screen overflow-x-hidden text-pool-dark ${geist.className}`;
 
-  let pathname = usePathname();
+  let pathname = useRouter().pathname;
   pathname = "/" + pathname.split("/")[1];
 
   const isPublic = routes.public.routes.some(
@@ -24,14 +24,14 @@ export default function RootLayout({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <div className={className}>
-        <UserProvider>
-          {isPublic && <Component {...pageProps} />}
-          {!isPublic && (
+        {isPublic && <Component {...pageProps} />}
+        {!isPublic && (
+          <UserProvider>
             <RouterProtector>
               <Component {...pageProps} />
             </RouterProtector>
-          )}
-        </UserProvider>
+          </UserProvider>
+        )}
       </div>
     </>
   );

@@ -1,60 +1,56 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 
-function Form({
-  title,
-  subtitle,
-  fields,
-  onBack,
-  buttonLabel,
-  onClick,
-  footer,
-}) {
+function Form({ steps, onSubmit, error }) {
+  const [pageNumber, setPageNumber] = useState(0);
+
   return (
-    <Card className="z-20 relative">
-      <CardHeader className="w-[350px]">
-        <CardTitle>
-          <h1>{title}</h1>
-        </CardTitle>
-        <CardDescription>
-          <h2>{subtitle}</h2>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form>
-          <div className="grid w-full items-center gap-4">
-            {fields.map((field, i) => {
-              return (
-                <div key={i} className="grid w-full items-center gap-1">
-                  {field}
-                </div>
-              );
-            })}
-          </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex flex-col items-center gap-4">
-        <div className="flex items-center gap-4">
-          {onBack ? (
-            <Button variant="ghost" size="fit" onClick={onBack}>
-              <ArrowLeft className="!w-8 !h-8 text-pool-black" />
-            </Button>
-          ) : (
-            <></>
-          )}
-          <Button onClick={onClick}>{buttonLabel}</Button>
-        </div>
-        {footer}
-      </CardFooter>
-    </Card>
+    <form onSubmit={onSubmit} className="flex flex-col items-center gap-6">
+      <div className="grid w-full items-center gap-4">
+        {steps &&
+          steps[pageNumber].map((field, i) => {
+            return (
+              <div key={i} className="grid w-full items-center gap-1">
+                {field}
+              </div>
+            );
+          })}
+      </div>
+      <div className="flex items-center gap-4">
+        {pageNumber > 0 && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="fit"
+            onClick={() => {
+              setPageNumber(pageNumber - 1);
+            }}
+          >
+            <ArrowLeft className="!w-8 !h-8 text-pool-black" />
+          </Button>
+        )}
+        {pageNumber === steps.length - 1 && (
+          <Button
+            type="submit"
+            disabled={Object.keys(error || {}).length !== 0}
+          >
+            Enviar
+          </Button>
+        )}
+
+        {pageNumber < steps.length - 1 && (
+          <Button
+            type="button"
+            onClick={() => {
+              setPageNumber(pageNumber + 1);
+            }}
+          >
+            Próximo
+          </Button>
+        )}
+      </div>
+    </form>
   );
 }
 

@@ -47,7 +47,7 @@ const userSchema = Joi.object({
     number: Joi.number().integer().min(0).max(999999).required(),
     complement: Joi.string().min(0).max(20).custom(customFilters.utcString),
     reference: Joi.string().min(0).max(40).custom(customFilters.utcString),
-  }),
+  }).required(),
 });
 
 const publicUserSchema = Joi.object({

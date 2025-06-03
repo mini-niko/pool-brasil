@@ -74,9 +74,9 @@ describe("POST to /api/v1/sessions", () => {
 
         expect(body.name).toBe("UnauthorizedError");
         expect(body.message).toBe(
-          "The email and/or password don't match any account.",
+          "O e-mail e/ou senha não correspondem a nenhuma conta.",
         );
-        expect(body.action).toBe("Send an email and password valid.");
+        expect(body.action).toBe("Envie um e-mail e uma senha válidos.");
         expect(body.status_code).toBe(401);
       });
     });

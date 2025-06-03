@@ -661,8 +661,6 @@ function ClientsTable({ data }) {
 function UserOptions({ data }) {
   const { isLoading, user } = useUser();
 
-  console.log(user.id === data.id);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -953,8 +951,6 @@ function UserUpdate({ id }) {
       },
       body: JSON.stringify(data),
     });
-
-    console.log(await response.json());
 
     if (response.status === 200) {
       mutate("/api/v1/users");

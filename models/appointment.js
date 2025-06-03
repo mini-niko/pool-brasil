@@ -1,7 +1,7 @@
 import database from "@/infra/database";
 import appointmentValidation from "./validation/appointment";
 import userValidation from "./validation/user";
-import { addMinutes, format, getDay } from "date-fns";
+import { addMinutes, format, getDay, parseISO } from "date-fns";
 
 async function createAppointment(appointment) {
   appointmentValidation.validate(appointment);
@@ -129,8 +129,12 @@ async function getAvaliableHoursForProfessional(id, date) {
   return avaliableHoursList;
 }
 
-function calculateAvaliableHours(date, scheduledHours) {
+function calculateAvaliableHours(dateString, scheduledHours) {
+  const date = parseISO(dateString);
   const dayOfWeek = getDay(date);
+
+  console.log(date, dayOfWeek);
+
   const constraint = constraints.date_time.week[dayOfWeek];
 
   const hoursList = [];
@@ -343,6 +347,11 @@ const constraints = {
   date_time: {
     week: [
       {
+        //Domingo
+        morning: {},
+        afternoon: {},
+      },
+      {
         //Segunda
         morning: {},
         afternoon: {
@@ -401,11 +410,6 @@ const constraints = {
             end: 18,
           },
         },
-      },
-      {
-        //Domingo
-        morning: {},
-        afternoon: {},
       },
     ],
   },

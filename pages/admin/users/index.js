@@ -597,7 +597,7 @@ function CreateAccountDialog({ children }) {
       <FormField
         key="confirm_password"
         id="confirm_password"
-        label="Senha"
+        label="Confirmar Senha"
         type="password"
         error={errors.confirm_password}
         register={register}
@@ -684,7 +684,7 @@ function UserOptions({ data }) {
 function UserDetails({ data }) {
   const featureLabels = {
     client: "Cliente",
-    professional: "Profissonal",
+    professional: "Profissional",
     admin: "Administrador",
   };
 

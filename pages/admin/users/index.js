@@ -597,7 +597,7 @@ function CreateAccountDialog({ children }) {
       <FormField
         key="confirm_password"
         id="confirm_password"
-        label="Senha"
+        label="Confirmar Senha"
         type="password"
         error={errors.confirm_password}
         register={register}
@@ -661,8 +661,6 @@ function ClientsTable({ data }) {
 function UserOptions({ data }) {
   const { isLoading, user } = useUser();
 
-  console.log(user.id === data.id);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -686,7 +684,7 @@ function UserOptions({ data }) {
 function UserDetails({ data }) {
   const featureLabels = {
     client: "Cliente",
-    professional: "Profissonal",
+    professional: "Profissional",
     admin: "Administrador",
   };
 
@@ -953,8 +951,6 @@ function UserUpdate({ id }) {
       },
       body: JSON.stringify(data),
     });
-
-    console.log(await response.json());
 
     if (response.status === 200) {
       mutate("/api/v1/users");

@@ -5,10 +5,15 @@ import authentication from "models/authentication.js";
 import { NotFoundError, ValidationError } from "errors";
 
 async function createUser(userData = {}) {
-  userData.cpf = cpf.format(userData.cpf).replaceAll(".", "").replace("-", "");
+  userData.cpf =
+    typeof userData.cpf === "string"
+      ? cpf.format(userData.cpf).replaceAll(".", "").replace("-", "")
+      : userData.cpf;
 
   userValidation.validate(userData);
   await userValidation.alreadyInUse(userData);
+
+  userData.password = await authentication.hashPassword(userData.password);
 
   const postUserResponse = await database.query(
     `
@@ -99,6 +104,7 @@ async function getUserByLogin(email, password) {
       u.birth_day,
       u.created_at,
       u.updated_at,
+      u.password,
       a.*,
       u.id as user_id
     FROM 
@@ -109,13 +115,17 @@ async function getUserByLogin(email, password) {
       u.id = a.user_id
     WHERE 
       u.email = $1
-    AND 
-      u.password = $2
     ;`,
-    [email, password],
+    [email],
   );
 
-  return formatUser(response.rows[0]);
+  const user = response.rows[0];
+
+  const hashedPassword = user ? user.password : "";
+
+  await authentication.compareHashPassword(password, hashedPassword);
+
+  return formatUser(user);
 }
 
 async function getAllUsers() {

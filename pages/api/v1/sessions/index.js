@@ -1,5 +1,5 @@
 import authentication from "@/models/authentication";
-import { NotFoundError, UnauthorizedError } from "errors";
+import { NotFoundError } from "errors";
 import controller from "models/controllers.js";
 import sessions from "models/sessions";
 import users from "models/users";
@@ -17,13 +17,6 @@ async function postHandler(req, res) {
   const login = req.body;
 
   const queryUser = await users.getUserByLogin(login.email, login.password);
-
-  if (!queryUser)
-    throw new UnauthorizedError({
-      message: "The email and/or password don't match any account.",
-      action: "Send an email and password valid.",
-      stack: new Error().stack,
-    });
 
   const token = await sessions.createSession(queryUser, res);
 

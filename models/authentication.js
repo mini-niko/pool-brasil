@@ -3,6 +3,8 @@ import email from "./email";
 import EmailComponent from "infra/component/email/ConfirmAccount";
 import sessions from "./sessions";
 import users from "./users";
+import security from "./security";
+import { UnauthorizedError } from "@/errors";
 
 async function injectUser(request, response, next) {
   const token = request.cookies["sessionToken"];
@@ -51,13 +53,33 @@ async function sendEmailToConfirmAccount(emailAdress, token) {
   email.sendMail(emailAdress, "Confirmação da conta", body);
 }
 
+async function hashPassword(password) {
+  return await security.hash(password);
+}
+
+async function compareHashPassword(password = "", hash = "") {
+  const match = await security.compareHash(password, hash);
+
+  if (!match) {
+    throw new UnauthorizedError({
+      message: "O e-mail e/ou senha não correspondem a nenhuma conta.",
+      action: "Envie um e-mail e uma senha válidos.",
+      stack: new Error().stack,
+    });
+  }
+
+  return true;
+}
+
 const authentication = {
-  generateToken,
-  getValueWithToken,
-  injectUser,
-  saveValueWithToken,
-  sendEmailToConfirmAccount,
   deleteValueWithToken,
+  getValueWithToken,
+  saveValueWithToken,
+  generateToken,
+  injectUser,
+  hashPassword,
+  compareHashPassword,
+  sendEmailToConfirmAccount,
 };
 
 export default authentication;

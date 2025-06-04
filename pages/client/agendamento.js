@@ -184,7 +184,7 @@ function StepOne({ data, next, back }) {
             <SelectContent>
               {professionals.data && (
                 <SelectGroup>
-                  {professionals.data.map((user) => {
+                  {professionals.data?.map((user) => {
                     return (
                       <SelectItem key={user.id} value={user.id}>
                         {user.name}
@@ -197,12 +197,12 @@ function StepOne({ data, next, back }) {
           </Select>
         </div>
         <div className="flex flex-col items-center gap-1 w-80">
-          <Label htmlFor="professional" className="text-lg text-pool-black">
+          <Label htmlFor="service" className="text-lg text-pool-black">
             Qual serviço você precisa?
           </Label>
           <Select
             onValueChange={(value) => {
-              const service = services.data.find(
+              const service = services.data?.find(
                 (s) => s.id === parseInt(value),
               );
               setService(service);
@@ -243,15 +243,23 @@ function StepOne({ data, next, back }) {
         />
         <Select value={time} onValueChange={setTime}>
           <SelectTrigger className="w-56">
-            <SelectValue placeholder="Selecione o horário" />
+            <SelectValue
+              placeholder={
+                avaliableHours.isLoading
+                  ? "Carregando horários..."
+                  : avaliableHours.data?.length > 0
+                    ? "Selecione o horário"
+                    : "Nenhum horário disponível"
+              }
+            />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               {avaliableHours.data &&
                 !avaliableHours.error &&
-                avaliableHours.data?.map((time, index) => {
+                avaliableHours.data?.map((time) => {
                   return (
-                    <SelectItem key={index} value={time}>
+                    <SelectItem key={time} value={time}>
                       {time}
                     </SelectItem>
                   );
@@ -566,7 +574,7 @@ function StepThree({ data, next, back, postAppointment }) {
             <span className="font-semibold text-pool-white h-fit">Valor</span>
           </div>
           <div className="px-4 py-2 w-full md:w-72 rounded-b-xl md:rounded-bl-none bg-pool-white shadow-xl shadow-pool-dark/20">
-            R$200,00
+            R$120,00
           </div>
         </div>
       </div>

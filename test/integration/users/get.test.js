@@ -1,69 +1,39 @@
+import userValidate from "@/models/validation/user";
 import orchestrator from "test/orchestrator";
 
-let mockUser = {
-  name: "Mock User",
-  cpf: "35638417052",
-  email: "example@mail.com",
-  password: "12345678",
-  confirm_password: "12345678",
-  birth_day: new Date("01/01/2000"),
-  address: {
-    state: "SC",
-    city: "Xanxerê",
-    street: "Avenida Brasil",
-    number: 1,
-    complement: "apto 4",
-    reference: "Ao lado do mercado XXX",
-  },
-};
+let sessionToken;
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  mockUser = await orchestrator.setMockUser(mockUser);
+  const mockUser = await orchestrator.createUser("admin");
+  sessionToken = await orchestrator.setSession(mockUser);
 });
 
 describe("GET to /api/v1/users", () => {
   describe("Annonymous User", () => {
-    describe("Retrieving an user", () => {
+    describe("Retrieving all users", () => {
       test("With valid ID", async () => {
-        const response = await fetch(
-          `http://localhost:3000/api/v1/users?id=${mockUser.id}`,
-        );
+        const response = await fetch(`http://localhost:3000/api/v1/users`, {
+          headers: {
+            Cookie: `sessionToken=${sessionToken}`,
+          },
+        });
 
         expect(response.status).toBe(200);
 
         const body = await response.json();
 
-        expect(body).toEqual(mockUser);
-      });
-      test("With non-existent ID", async () => {
-        const invalidId = "440e4e6b-0c5b-418e-985e-4c05e4e719cf";
+        expect(Array.isArray(body)).toBeTruthy();
+        expect(body).toHaveLength(1);
 
-        const response = await fetch(
-          `http://localhost:3000/api/v1/users?id=${invalidId}`,
-        );
+        const user = body[0];
 
-        expect(response.status).toBe(404);
-      });
-      test("With invalid ID", async () => {
-        const invalidId = "invalid-id";
+        const userValidationError =
+          userValidate.publicUserSchema.validate(user).error?.details[0];
 
-        const response = await fetch(
-          `http://localhost:3000/api/v1/users?id=${invalidId}`,
-        );
-
-        expect(response.status).toBe(400);
-
-        const body = await response.json();
-
-        expect(body).toEqual({
-          name: "ValidationError",
-          message: '"id" must be and uuid id.',
-          action: "Try send an valid id.",
-          status_code: 400,
-        });
+        expect(userValidationError).toBeUndefined();
       });
     });
   });

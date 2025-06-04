@@ -7,6 +7,7 @@ const runnerOptions = {
   direction: "up",
   verbose: true,
   migrationsTable: "pgmigrations",
+  log: () => {},
 };
 
 async function listPendingMigrations() {

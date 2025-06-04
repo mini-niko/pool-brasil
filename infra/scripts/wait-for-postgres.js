@@ -6,7 +6,10 @@ checkPostgres();
 const loading = loadingFunc();
 
 function checkPostgres() {
-  exec("docker exec postgres-dev pg_isready --host localhost", handleReturn);
+  exec(
+    "docker exec pool-postgres-dev pg_isready --host localhost",
+    handleReturn,
+  );
 
   function handleReturn(error, stdout) {
     if (stdout.search("accepting connections") === -1) {

@@ -1,10 +1,16 @@
+import authentication from "@/models/authentication";
+import authorization from "@/models/authorization";
 import controller from "@/models/controllers";
 import migrator from "infra/migrator";
 import { createRouter } from "next-connect";
 
-export default createRouter().get(getHandler).post(postHandler).handler({
-  onError: controller.handlerError,
-});
+export default createRouter()
+  .use(authentication.injectUser)
+  .get(authorization.canRequest(["admin"]), getHandler)
+  .post(authorization.canRequest(["admin"]), postHandler)
+  .handler({
+    onError: controller.handlerError,
+  });
 
 async function getHandler(req, res) {
   const pendingMigrations = await migrator.listPendingMigrations();

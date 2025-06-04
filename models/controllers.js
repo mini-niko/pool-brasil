@@ -5,7 +5,7 @@ function handlerError(err, req, res) {
   let responseError = err;
 
   if (responseError.statusCode === 500 || !responseError.statusCode) {
-    console.error(err);
+    console.log(err);
     responseError = new InternalServerError({});
   }
 

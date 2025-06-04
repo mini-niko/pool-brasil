@@ -1,35 +1,48 @@
 import { createRouter } from "next-connect";
 import users from "models/users";
 import controller from "models/controllers";
-import { ValidationError } from "errors";
-import authorization from "models/authorization";
+import authentication from "@/models/authentication";
+import authorization from "@/models/authorization";
 
-export default createRouter().get(getHandler).post(postHandler).handler({
-  onError: controller.handlerError,
-});
+export default createRouter()
+  .use(authentication.injectUser)
+  .get(authorization.canRequest(["admin"]), getHandler)
+  .post(authorization.canRequest(["admin"]), postHandler)
+  .patch(authorization.canRequest(["admin"]), patchHandler)
+  .delete(authorization.canRequest(["admin"]), deleteHandler)
+  .handler({
+    onError: controller.handlerError,
+  });
 
 async function getHandler(req, res) {
-  const userId = req.query.id;
+  const usersList = await users.getAllUsers();
 
-  if (!userId)
-    throw new ValidationError({
-      message: "ID cannot be null.",
-      action: "Add an valid user ID in request.",
-    });
-
-  const user = await users.getUser("id", userId);
-
-  if (!user) return res.status(404).end();
-
-  res.status(200).json(user);
+  res.status(200).json(usersList);
 }
 
 async function postHandler(req, res) {
   const user = await users.createUser(req.body);
 
-  const token = await authorization.saveValueWithToken("confirmation", user.id);
+  res.status(201).json(user);
+}
 
-  authorization.sendEmailToConfirmAccount(user.email, token);
+async function patchHandler(req, res) {
+  const {
+    body: data,
+    query: { id },
+  } = req;
 
-  res.status(201).end();
+  const user = await users.updateUser(id, data);
+
+  res.status(200).json(user);
+}
+
+async function deleteHandler(req, res) {
+  const {
+    query: { id },
+  } = req;
+
+  await users.deleteUser(id);
+
+  res.status(200).end();
 }

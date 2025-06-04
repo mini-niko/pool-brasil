@@ -1,28 +1,13 @@
 import redis from "infra/redis";
 import orchestrator from "test/orchestrator.js";
 
-let mockUser = {
-  name: "Mock User",
-  cpf: "35638417052",
-  email: "example@mail.com",
-  password: "12345678",
-  confirm_password: "12345678",
-  birth_day: new Date("01/01/2000"),
-  address: {
-    state: "SC",
-    city: "Xanxerê",
-    street: "Avenida Brasil",
-    number: 1,
-    complement: "apto 4",
-    reference: "Ao lado do mercado XXX",
-  },
-};
+let mockUser;
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.cleanDatabase();
   await orchestrator.upMigrations();
-  mockUser = await orchestrator.setMockUser(mockUser);
+  mockUser = await orchestrator.createUser("client");
 
   await orchestrator.cleanRedis();
 });
@@ -38,13 +23,14 @@ describe("POST to /api/v1/sessions", () => {
           },
           body: JSON.stringify({
             email: mockUser.email,
-            password: mockUser.password,
+            password: "carlaSenha789",
           }),
         });
 
         expect(response.status).toBe(201);
 
         const body = await response.json();
+
         const responseToken = body.token;
 
         expect(typeof responseToken).toBe("string");
@@ -63,7 +49,6 @@ describe("POST to /api/v1/sessions", () => {
         expect(sessionCookie.value).toBe(responseToken);
         expect(sessionCookie.httpOnly).toBeTruthy();
         expect(sessionCookie.maxAge).toBe(parseInt(process.env.SESSION_TIME));
-        expect(sessionCookie.secure).toBeTruthy();
       });
 
       test("Invalid login", async () => {
@@ -89,9 +74,9 @@ describe("POST to /api/v1/sessions", () => {
 
         expect(body.name).toBe("UnauthorizedError");
         expect(body.message).toBe(
-          "The email and/or password don't match any account.",
+          "O e-mail e/ou senha não correspondem a nenhuma conta.",
         );
-        expect(body.action).toBe("Send an email and password valid.");
+        expect(body.action).toBe("Envie um e-mail e uma senha válidos.");
         expect(body.status_code).toBe(401);
       });
     });

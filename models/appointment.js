@@ -133,8 +133,6 @@ function calculateAvaliableHours(dateString, scheduledHours) {
   const date = parseISO(dateString);
   const dayOfWeek = getDay(date);
 
-  console.log(date, dayOfWeek);
-
   const constraint = constraints.date_time.week[dayOfWeek];
 
   const hoursList = [];

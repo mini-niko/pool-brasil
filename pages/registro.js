@@ -14,7 +14,7 @@ import {
 import {} from "@radix-ui/react-select";
 import { Controller, useForm } from "react-hook-form";
 import useSWR from "swr";
-import { fetcher } from "@/lib/utils";
+import { capitalize, fetcher } from "@/lib/utils";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/ui/form-field";
@@ -34,17 +34,23 @@ const registerUserSchema = z
   .object({
     name: z
       .string()
+      .trim()
       .min(3, "Seu nome deve ter mais de 3 letras.")
       .regex(
-        /^[A-Za-zÀ-ÿ]+(?:[-'\s][A-Za-zÀ-ÿ]+)*$/,
+        /^[A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+|[-'][A-Za-zÀ-ÿ]+)*$/,
         "Seu nome deve conter apenas letras e espaços.",
-      ),
-    cpf: z.string().refine((cpf) => cpfValidator.isValid(cpf), {
-      message: "Seu CPF deve ser válido.",
-    }),
-    email: z.string().email("Seu email deve ser válido."),
+      )
+      .transform(capitalize),
+    cpf: z
+      .string()
+      .trim()
+      .refine((cpf) => cpfValidator.isValid(cpf), {
+        message: "Seu CPF deve ser válido.",
+      }),
+    email: z.string().trim().email("Seu email deve ser válido."),
     birth_day: z
       .string()
+      .trim()
       .refine((val) => {
         const date = new Date(val);
         return !isNaN(date?.getTime());
@@ -58,11 +64,15 @@ const registerUserSchema = z
         );
         return new Date(val) <= minAge;
       }, "Você deve ter, pelo menos, 16 anos."),
-    password: z.string().min(8, "Sua senha deve ter, no mínimo, 8 caracteres"),
+    password: z
+      .string()
+      .trim()
+      .min(8, "Sua senha deve ter, no mínimo, 8 caracteres"),
     confirm_password: z.string(),
     address: z.object({
       street: z
         .string()
+        .trim()
         .nonempty("A sua rua deve ser inserida.")
         .regex(/^[\p{L}0-9 ]+$/u, "A rua deve conter apenas letras e números.")
         .min(8, "A rua deve conter, pelo menos, 8 letras."),
@@ -76,10 +86,12 @@ const registerUserSchema = z
         .max(999999, "O número deve ser válido."),
       complement: z
         .string()
+        .trim()
         .min(0, "Teste")
         .max(40, "O complemento deve ser mais curto."),
       reference: z
         .string()
+        .trim()
         .min(0, "Teste")
         .max(40, "A referência deve ser mais curta."),
       state: z.string().min(1, "O estado é obrigatório."),

@@ -35,8 +35,8 @@ function OpenMap({ setCoordinates }) {
 
     function onPosition(position) {
       setCoordinates({
-        latitude: parseFloat(position.coords.latitude.toFixed(6)),
-        longitude: parseFloat(position.coords.longitude.toFixed(6)),
+        latitude: parseFloat(position.coords.latitude),
+        longitude: parseFloat(position.coords.longitude),
       });
 
       getMap(

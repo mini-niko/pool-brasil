@@ -53,7 +53,7 @@ import {
   Search,
 } from "lucide-react";
 import useSWR, { mutate } from "swr";
-import { fetcher } from "@/lib/utils";
+import { capitalize, fetcher } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -78,17 +78,23 @@ const adminCreateUserSchema = z
   .object({
     name: z
       .string()
+      .trim()
       .min(3, "O nome deve ter mais de 3 letras.")
       .regex(
-        /^[A-Za-zÀ-ÿ]+(?:[-'\s][A-Za-zÀ-ÿ]+)*$/,
+        /^[A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+|[-'][A-Za-zÀ-ÿ]+)*$/,
         "O nome deve conter apenas letras e espaços.",
-      ),
-    cpf: z.string().refine((cpf) => cpfValidator.isValid(cpf), {
-      message: "O CPF deve ser válido.",
-    }),
-    email: z.string().email("O email deve ser válido."),
+      )
+      .transform(capitalize),
+    cpf: z
+      .string()
+      .trim()
+      .refine((cpf) => cpfValidator.isValid(cpf), {
+        message: "O CPF deve ser válido.",
+      }),
+    email: z.string().trim().email("O email deve ser válido."),
     birth_day: z
       .string()
+      .trim()
       .refine((val) => {
         const date = new Date(val);
         return !isNaN(date?.getTime());
@@ -108,6 +114,7 @@ const adminCreateUserSchema = z
     address: z.object({
       street: z
         .string()
+        .trim()
         .regex(/^[\p{L}0-9 ]+$/u, "A rua deve conter apenas letras e números.")
         .min(8, "A rua deve conter, pelo menos, 8 letras."),
       number: z.coerce
@@ -120,11 +127,16 @@ const adminCreateUserSchema = z
         .max(999999, "O número deve ser válido."),
       complement: z
         .string()
+        .trim()
         .min(0)
         .max(40, "O complemento deve ser mais curto."),
-      reference: z.string().min(0).max(40, "A referência deve ser mais curta."),
-      state: z.string().min(1, "O estado é obrigatório."),
-      city: z.string().min(1, "A cidade é obrigatório."),
+      reference: z
+        .string()
+        .trim()
+        .min(0)
+        .max(40, "A referência deve ser mais curta."),
+      state: z.string().trim().min(1, "O estado é obrigatório."),
+      city: z.string().trim().min(1, "A cidade é obrigatório."),
     }),
   })
   .superRefine((val, ctx) => {
@@ -140,6 +152,7 @@ const adminCreateUserSchema = z
 const adminUpdateUserSchema = z.object({
   name: z
     .string()
+    .trim()
     .refine((val) => !val || val.length >= 3, {
       message: "O nome deve ter mais de 3 letras.",
     })
@@ -150,6 +163,7 @@ const adminUpdateUserSchema = z.object({
     .optional(),
   cpf: z
     .string()
+    .trim()
     .optional()
     .refine(
       (cpf) => !cpf || cpfValidator.isValid(cpf),
@@ -157,22 +171,27 @@ const adminUpdateUserSchema = z.object({
     ),
   email: z
     .string()
+    .trim()
     .optional()
     .refine(
       (val) => !val || z.string().email().safeParse(val).success,
       "O email deve ser válido.",
     ),
-  birth_day: z.string().refine((val) => {
-    const today = new Date();
-    const minAge = new Date(
-      today.getFullYear() - 16,
-      today.getMonth(),
-      today.getDate(),
-    );
-    return !val || new Date(val) <= minAge;
-  }, "O usuário deve ter, pelo menos, 16 anos."),
+  birth_day: z
+    .string()
+    .trim()
+    .refine((val) => {
+      const today = new Date();
+      const minAge = new Date(
+        today.getFullYear() - 16,
+        today.getMonth(),
+        today.getDate(),
+      );
+      return !val || new Date(val) <= minAge;
+    }, "O usuário deve ter, pelo menos, 16 anos."),
   features: z
     .string()
+    .trim()
     .refine(
       (val) =>
         !val ||
@@ -188,6 +207,7 @@ const adminUpdateUserSchema = z.object({
   address: z.object({
     street: z
       .string()
+      .trim()
       .refine(
         (val) => !val || /^[\p{L}0-9 ]+$/u.test(val),
         "A rua deve conter apenas letras e números.",
@@ -198,6 +218,7 @@ const adminUpdateUserSchema = z.object({
       ),
     number: z
       .string()
+      .trim()
       .transform((val) => (val ? Number.parseInt(val) : ""))
       .refine(
         (val) =>
@@ -205,10 +226,18 @@ const adminUpdateUserSchema = z.object({
         "O número precisa ser válido.",
       )
       .optional(),
-    complement: z.string().min(0).max(40, "O complemento deve ser mais curto."),
-    reference: z.string().min(0).max(40, "A referência deve ser mais curta."),
-    state: z.string(),
-    city: z.string(),
+    complement: z
+      .string()
+      .trim()
+      .min(0)
+      .max(40, "O complemento deve ser mais curto."),
+    reference: z
+      .string()
+      .trim()
+      .min(0)
+      .max(40, "A referência deve ser mais curta."),
+    state: z.string().trim(),
+    city: z.string().trim(),
   }),
 });
 

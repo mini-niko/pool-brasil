@@ -1,4 +1,4 @@
-import { ValidationError } from "@/errors";
+import { ValidationError } from "infra/errors";
 import Joi from "joi";
 
 const daysInAdvance = 2;

@@ -2,7 +2,7 @@ import database from "infra/database";
 import userValidation from "./validation/user";
 import { cpf } from "cpf-cnpj-validator";
 import authentication from "models/authentication.js";
-import { NotFoundError, ValidationError } from "errors";
+import { NotFoundError, ValidationError } from "infra/errors";
 
 async function createUser(userData = {}) {
   userData.cpf =

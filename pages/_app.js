@@ -1,9 +1,9 @@
 import Head from "next/head";
 import "styles/global.css";
-import { UserProvider } from "interface/hooks/useUser.js";
+import { UserProvider } from "@/hooks/useUser.js";
 import { Geist } from "next/font/google";
-import { RouterProtector } from "@/interface/hooks/RouterProtector";
-import routes from "@/infra/routes";
+import { RouterProtector } from "@/hooks/RouterProtector";
+import routes from "infra/routes";
 import { useRouter } from "next/router";
 
 const geist = Geist({ subsets: ["latin"] });

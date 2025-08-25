@@ -1,4 +1,4 @@
-import routes from "@/infra/routes";
+import routes from "infra/routes";
 import useUser from "./useUser";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";

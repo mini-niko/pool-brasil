@@ -1,7 +1,7 @@
 import { createRouter } from "next-connect";
 import controller from "models/controllers";
 import users from "models/users";
-import { ValidationError } from "errors";
+import { ValidationError } from "infra/errors";
 
 export default createRouter().post(postHandler).handler({
   onError: controller.handlerError,

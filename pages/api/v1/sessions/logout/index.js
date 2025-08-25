@@ -1,7 +1,7 @@
-import controller from "@/models/controllers";
+import controller from "models/controllers";
 import { createRouter } from "next-connect";
 import { serialize } from "cookie";
-import sessions from "@/models/sessions";
+import sessions from "models/sessions";
 
 export default createRouter().get(getHandler).handler({
   onError: controller.handlerError,

@@ -1,4 +1,4 @@
-import userValidate from "@/models/validation/user";
+import userValidate from "models/validation/user";
 import orchestrator from "test/orchestrator";
 
 let sessionToken;

@@ -1,4 +1,4 @@
-import controller from "@/models/controllers";
+import controller from "models/controllers";
 import database from "infra/database";
 import { createRouter } from "next-connect";
 

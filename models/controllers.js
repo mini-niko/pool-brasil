@@ -1,4 +1,4 @@
-import { InternalServerError } from "errors";
+import { InternalServerError } from "infra/errors";
 import snakeize from "snakeize";
 
 function handlerError(err, req, res) {

@@ -1,8 +1,8 @@
 import { createRouter } from "next-connect";
 import users from "models/users";
 import controller from "models/controllers";
-import authentication from "@/models/authentication";
-import authorization from "@/models/authorization";
+import authentication from "models/authentication";
+import authorization from "models/authorization";
 
 export default createRouter()
   .use(authentication.injectUser)

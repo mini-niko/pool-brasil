@@ -1,6 +1,6 @@
-import authentication from "@/models/authentication";
-import authorization from "@/models/authorization";
-import controller from "@/models/controllers";
+import authentication from "models/authentication";
+import authorization from "models/authorization";
+import controller from "models/controllers";
 import migrator from "infra/migrator";
 import { createRouter } from "next-connect";
 

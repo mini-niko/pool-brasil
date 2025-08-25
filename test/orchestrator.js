@@ -1,4 +1,4 @@
-import appointment from "@/models/appointment";
+import appointment from "models/appointment";
 import retry from "async-retry";
 import database from "infra/database";
 import migrator from "infra/migrator";

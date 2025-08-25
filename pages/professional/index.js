@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import NavigationBar from "@/interface/components/NavigationBar";
+import NavigationBar from "@/components/NavigationBar";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -41,8 +41,8 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@radix-ui/react-alert-dialog";
-import Container from "@/interface/components/Container";
-import useUser from "@/interface/hooks/useUser";
+import Container from "@/components/Container";
+import useUser from "@/hooks/useUser";
 import useSWR, { mutate } from "swr";
 import { fetcher } from "@/lib/utils";
 import { format } from "date-fns";

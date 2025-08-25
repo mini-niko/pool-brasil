@@ -1,5 +1,5 @@
 import Image from "next/image";
-import symbol from "public/principal-symbol.svg";
+import symbol from "@/public/principal-symbol.svg";
 
 function DefaultContainer({ children }) {
   return (

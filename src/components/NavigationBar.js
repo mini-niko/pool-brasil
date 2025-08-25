@@ -1,4 +1,4 @@
-import logo from "public/nome_branco.png";
+import logo from "@/public/nome_branco.png";
 import Image from "next/image";
 import { Settings } from "lucide-react";
 

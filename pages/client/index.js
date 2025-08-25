@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
-import useUser from "interface/hooks/useUser";
-import NavigationBar from "interface/components/NavigationBar";
+import useUser from "@/hooks/useUser";
+import NavigationBar from "@/components/NavigationBar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, ClockFading, Loader2 } from "lucide-react";
 import { useState } from "react";
-import Container from "@/interface/components/Container";
+import Container from "@/components/Container";
 
 function Index() {
   const router = useRouter();

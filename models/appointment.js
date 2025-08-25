@@ -1,6 +1,6 @@
-import database from "@/infra/database";
-import appointmentValidation from "./validation/appointment";
-import userValidation from "./validation/user";
+import database from "infra/database.js";
+import appointmentValidation from "models/validation/appointment.js";
+import userValidation from "models/validation/user.js";
 import { addMinutes, format, getDay, parseISO } from "date-fns";
 
 async function createAppointment(appointment) {

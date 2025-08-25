@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import NavigationBar from "@/interface/components/NavigationBar";
+import NavigationBar from "@/components/NavigationBar";
 import { EllipsisVertical, MapPin } from "lucide-react";
 
 import {
@@ -23,7 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import Container from "@/interface/components/Container";
+import Container from "@/components/Container";
 import useSWR from "swr";
 import { fetcher } from "@/lib/utils";
 import { format } from "date-fns";

@@ -37,8 +37,8 @@ import {
 } from "@/components/ui/alert-dialog";
 
 // Componentes próprios
-import Container from "@/interface/components/Container";
-import NavigationBar from "@/interface/components/NavigationBar";
+import Container from "@/components/Container";
+import NavigationBar from "@/components/NavigationBar";
 
 // React/Next
 import Link from "next/link";

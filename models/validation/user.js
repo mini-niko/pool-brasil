@@ -1,5 +1,5 @@
 import { cpf } from "cpf-cnpj-validator";
-import { DuplicateError, ValidationError } from "errors";
+import { DuplicateError, ValidationError } from "infra/errors";
 import Joi from "joi";
 import users from "models/users";
 

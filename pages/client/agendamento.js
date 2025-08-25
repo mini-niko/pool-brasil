@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import NavigationBar from "@/interface/components/NavigationBar";
+import NavigationBar from "@/components/NavigationBar";
 import { ArrowLeft, PartyPopper } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -20,11 +20,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import Confetti from "react-confetti";
 import { Input } from "@/components/ui/input";
-import Container from "@/interface/components/Container";
+import Container from "@/components/Container";
 import useSWR from "swr";
 import { fetcher } from "@/lib/utils";
-import OpenMap from "@/interface/components/OpenMap";
-import useUser from "@/interface/hooks/useUser";
+import OpenMap from "@/components/OpenMap";
+import useUser from "@/hooks/useUser";
 
 function Agendamento() {
   const router = useRouter();

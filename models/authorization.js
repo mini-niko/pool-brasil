@@ -1,4 +1,4 @@
-import { UnauthorizedError } from "@/errors";
+import { UnauthorizedError } from "infra/errors";
 
 function canRequest(features) {
   return function (request, response, next) {

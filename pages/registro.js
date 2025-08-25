@@ -14,7 +14,7 @@ import {
 import {} from "@radix-ui/react-select";
 import { Controller, useForm } from "react-hook-form";
 import useSWR from "swr";
-import { capitalize, fetcher } from "@/lib/utils";
+import { capitalize, fetcher } from "@/lib/utils.js";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/ui/form-field";

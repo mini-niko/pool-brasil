@@ -1,5 +1,5 @@
-import authentication from "@/models/authentication";
-import { NotFoundError } from "errors";
+import authentication from "models/authentication";
+import { NotFoundError } from "infra/errors";
 import controller from "models/controllers.js";
 import sessions from "models/sessions";
 import users from "models/users";

@@ -1,8 +1,8 @@
 import { createRouter } from "next-connect";
 import users from "models/users";
 import controller from "models/controllers";
-import { ValidationError } from "errors";
-import authentication from "@/models/authentication";
+import { ValidationError } from "infra/errors";
+import authentication from "models/authentication";
 
 export default createRouter()
   .use(authentication.injectUser)

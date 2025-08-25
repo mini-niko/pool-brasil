@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import Container from "@/interface/components/Container";
-import NavigationBar from "@/interface/components/NavigationBar";
-import useUser from "@/interface/hooks/useUser";
+import Container from "@/components/Container";
+import NavigationBar from "@/components/NavigationBar";
+import useUser from "@/hooks/useUser";
 import { CalendarClock, Users } from "lucide-react";
 import { useRouter } from "next/router";
 

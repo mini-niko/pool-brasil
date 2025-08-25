@@ -4,7 +4,7 @@ import EmailComponent from "infra/component/email/ConfirmAccount";
 import sessions from "./sessions";
 import users from "./users";
 import security from "./security";
-import { UnauthorizedError } from "@/errors";
+import { UnauthorizedError } from "infra/errors";
 
 async function injectUser(request, response, next) {
   const token = request.cookies["sessionToken"];
